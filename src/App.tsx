@@ -14,6 +14,7 @@ import { Connectivity, NftInfo, EditionNfts } from './connectivity';
 require('@solana/wallet-adapter-react-ui/styles.css');
 
 const log = console.log;
+let isInit = false;
 
 function App() {
     const solNetwork = WalletAdapterNetwork.Devnet;
@@ -30,7 +31,7 @@ function App() {
 
     return (
         <ConnectionProvider endpoint={endpoint}>
-            <WalletProvider wallets={wallets}>
+            <WalletProvider wallets={wallets} autoConnect={true}>
                 <WalletModalProvider>
                     <Content />
                 </WalletModalProvider>
@@ -45,7 +46,12 @@ const Content = () => {
     const [tokenAmount, setTokenAmount] = useState(0)
     const connectivity = new Connectivity(wallet)
     const [nfts, setNfts] = useState<NftInfo>(null);
-    const [update, setUpdate] = useState(false)
+    const [update, setUpdate] = useState(true)
+    const [userState, setUserState] = useState({
+        burnCount: 0,
+        currentValidation: null,
+        isRewardable: false
+    })
 
     const c1Nfts = nfts?.c1Nfts?.length == null ? 0 : nfts.c1Nfts.length;
     const c2Nfts = nfts?.c2Nfts?.length == null ? 0 : nfts.c2Nfts.length;
@@ -56,34 +62,46 @@ const Content = () => {
     const b3Require = 8;
 
     useEffect(() => {
-        connectivity._getCollectionNft().then((value) => setNfts(value))
+        const user = wallet.publicKey;
+        if (user != null) connectivity.__getUserStateInfo(user).then(setUserState).catch(() => {
+            log("Seting default")
+            setUserState({
+                burnCount: 0,
+                currentValidation: null,
+                isRewardable: false
+            })
+        })
+
+        if (!isInit) {
+            connectivity._getCollectionNft().then((value) => setNfts(value))
+            // isInit = true
+        }
     }, [wallet.publicKey, update])
 
     log("nfts: ", nfts)
-
-
+    log("UserState: ", userState)
 
     return <>
         <div className="app">
             <WalletMultiButton />
             <button onClick={async () => {
-                await connectivity._createNft();
-
+                // await connectivity._createNft();
                 // await connectivity._getMetadata(connectivity.nft1)
-
-                // await connectivity._getMetadata(new web3.PublicKey("tr8DtKTKsda3d8QVQssHGJ3VgdwD2drJUCcBxz5SAu7")) 
+                // await connectivity._getMetadata(new web3.PublicKey("CxmDdqGEBgFfkuqoQJyK8xrK9yhG7mqkBw4ZsPuXRCYg")) 
                 // await connectivity._getMetadata(new web3.PublicKey("9juFNds5YraQJd88yU2x9uT9jxCD8KYwA5AMtFjABEkJ")) 
-
             }}>Click</button>
 
-            <center>
+            <button disabled={userState?.isRewardable != true} onClick={async () => {
+                await connectivity.getRewardNft();
+            }}>Get Reward</button>
 
+            <center>
                 <div style={{ display: 'flex' }}>
 
                     <div style={{ display: 'block', padding: '20px', margin: '10px' }}>
                         <h4>Require {b1Require} | Available : {c1Nfts}</h4>
                         <button disabled={b1Require > c1Nfts} onClick={async () => {
-                            await connectivity.burn(nfts.c1Nfts.slice(0, b1Require), connectivity.collectionNft1)
+                            await connectivity.burn(nfts.c1Nfts.slice(0, b1Require))
                             //NOTE: need reload or refresh page
                         }} >Burn#1</button>
                     </div>
@@ -91,20 +109,20 @@ const Content = () => {
                     <div style={{ display: 'block', padding: '20px', margin: '10px' }}>
                         <h4>Require {b2Require} | Available : {c2Nfts}</h4>
                         <button disabled={b2Require > c2Nfts} onClick={async () => {
-                            await connectivity.burn(nfts.c2Nfts.slice(0, b2Require), connectivity.collectionNft2)
+                            await connectivity.burn(nfts.c2Nfts.slice(0, b2Require))
                             //NOTE: need reload or refresh page
                         }} >Burn#2</button>
                     </div>
 
                     <div style={{ display: 'block', padding: '20px', margin: '10px' }}>
                         <h4>Require {b3Require} | Available : {c3Nfts}</h4>
-                        <button disabled={b3Require > c3Nfts} onClick={async () => {
-                            await connectivity.burn(nfts.c3Nfts.slice(0, b3Require), connectivity.collectionNft3)
+                        <button disabled={false} onClick={async () => {
+                            // const input = x
+                            await connectivity.burn(nfts?.c3Nfts?.slice(0, b3Require))
+                            // await connectivity.burn(nfts?.c3Nfts)
                             //NOTE: need reload or refresh page
                         }} >Burn#3</button>
                     </div>
-
-
                 </div>
             </center>
 
