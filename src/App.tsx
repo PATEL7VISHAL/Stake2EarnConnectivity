@@ -9,7 +9,7 @@ import {
 } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { Connectivity, NftInfo, EditionNfts } from './connectivity';
+import { Connectivity, NftInfo, EditionNfts, TransactionType } from './connectivity';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -53,9 +53,9 @@ const Content = () => {
         isRewardable: false
     })
 
-    const c1Nfts = nfts?.c1Nfts?.length == null ? 0 : nfts.c1Nfts.length;
-    const c2Nfts = nfts?.c2Nfts?.length == null ? 0 : nfts.c2Nfts.length;
-    const c3Nfts = nfts?.c3Nfts?.length == null ? 0 : nfts.c3Nfts.length;
+    const m1EditionNfts = nfts?.m1EditionNfts?.length == null ? 0 : nfts.m1EditionNfts.length;
+    const m2EditionNfts = nfts?.m2EditionNfts?.length == null ? 0 : nfts.m2EditionNfts.length;
+    const m3EditionNfts = nfts?.m3EditionNfts?.length == null ? 0 : nfts.m3EditionNfts.length;
 
     const b1Require = 1;
     const b2Require = 4;
@@ -73,7 +73,7 @@ const Content = () => {
         })
 
         if (!isInit) {
-            connectivity._getCollectionNft().then((value) => setNfts(value))
+            connectivity._getEditionNfts().then((value) => setNfts(value))
             // isInit = true
         }
     }, [wallet.publicKey, update])
@@ -86,40 +86,41 @@ const Content = () => {
             <WalletMultiButton />
             <button onClick={async () => {
                 // await connectivity._createNft();
-                // await connectivity._getMetadata(connectivity.nft1)
-                // await connectivity._getMetadata(new web3.PublicKey("CxmDdqGEBgFfkuqoQJyK8xrK9yhG7mqkBw4ZsPuXRCYg")) 
-                // await connectivity._getMetadata(new web3.PublicKey("9juFNds5YraQJd88yU2x9uT9jxCD8KYwA5AMtFjABEkJ")) 
+
+                //NOTE : 32LKHoKh6R5JMqcAAWXsYPRszRNuciB89mB7K9bBmAev 
+                // send: ABqntxbQLuwenbiJR8euJm2aKeNjsjfdem4pUm9C9o1J
+                // await connectivity.__sendNftToProgram("");
             }}>Click</button>
 
             <button disabled={userState?.isRewardable != true} onClick={async () => {
-                await connectivity.getRewardNft();
+                await connectivity.getRewardNft(new web3.PublicKey("ABqntxbQLuwenbiJR8euJm2aKeNjsjfdem4pUm9C9o1J"), TransactionType.Normal);
             }}>Get Reward</button>
 
             <center>
                 <div style={{ display: 'flex' }}>
 
                     <div style={{ display: 'block', padding: '20px', margin: '10px' }}>
-                        <h4>Require {b1Require} | Available : {c1Nfts}</h4>
-                        <button disabled={b1Require > c1Nfts} onClick={async () => {
-                            await connectivity.burn(nfts.c1Nfts.slice(0, b1Require))
+                        <h4>Require {b1Require} | Available : {m1EditionNfts}</h4>
+                        <button disabled={b1Require > m1EditionNfts} onClick={async () => {
+                            await connectivity.burn(nfts.m1EditionNfts.slice(0, b1Require))
                             //NOTE: need reload or refresh page
                         }} >Burn#1</button>
                     </div>
 
                     <div style={{ display: 'block', padding: '20px', margin: '10px' }}>
-                        <h4>Require {b2Require} | Available : {c2Nfts}</h4>
-                        <button disabled={b2Require > c2Nfts} onClick={async () => {
-                            await connectivity.burn(nfts.c2Nfts.slice(0, b2Require))
+                        <h4>Require {b2Require} | Available : {m2EditionNfts}</h4>
+                        <button disabled={b2Require > m2EditionNfts} onClick={async () => {
+                            await connectivity.burn(nfts.m2EditionNfts.slice(0, b2Require))
                             //NOTE: need reload or refresh page
                         }} >Burn#2</button>
                     </div>
 
                     <div style={{ display: 'block', padding: '20px', margin: '10px' }}>
-                        <h4>Require {b3Require} | Available : {c3Nfts}</h4>
+                        <h4>Require {b3Require} | Available : {m3EditionNfts}</h4>
                         <button disabled={false} onClick={async () => {
                             // const input = x
-                            await connectivity.burn(nfts?.c3Nfts?.slice(0, b3Require))
-                            // await connectivity.burn(nfts?.c3Nfts)
+                            await connectivity.burn(nfts?.m3EditionNfts?.slice(0, b3Require))
+                            // await connectivity.burn(nfts?.m3EditionNfts)
                             //NOTE: need reload or refresh page
                         }} >Burn#3</button>
                     </div>

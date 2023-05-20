@@ -32,10 +32,6 @@ export type HsNftBurn = {
               3
             ]
           }
-        },
-        {
-          "name": "receiver",
-          "type": "publicKey"
         }
       ]
     },
@@ -84,27 +80,6 @@ export type HsNftBurn = {
       "args": [
         {
           "name": "newOwner",
-          "type": "publicKey"
-        }
-      ]
-    },
-    {
-      "name": "setReceiver",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "mainStateAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "newReceiver",
           "type": "publicKey"
         }
       ]
@@ -216,11 +191,6 @@ export type HsNftBurn = {
           "isSigner": true
         },
         {
-          "name": "receiver",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "userState",
           "isMut": true,
           "isSigner": false
@@ -231,66 +201,22 @@ export type HsNftBurn = {
           "isSigner": false
         },
         {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "ata",
+          "name": "mainAccountAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "metadataAccount",
+          "name": "userAta",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "masterEditionAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mplProgram",
-          "isMut": false,
           "isSigner": false
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "symbol",
-          "type": "string"
-        },
-        {
-          "name": "uri",
-          "type": "string"
-        },
-        {
-          "name": "collectionMint",
-          "type": {
-            "option": "publicKey"
-          }
-        }
-      ]
+      "args": []
     }
   ],
   "accounts": [
@@ -304,10 +230,6 @@ export type HsNftBurn = {
         "fields": [
           {
             "name": "owner",
-            "type": "publicKey"
-          },
-          {
-            "name": "receiver",
             "type": "publicKey"
           },
           {
@@ -357,7 +279,7 @@ export type HsNftBurn = {
         "kind": "struct",
         "fields": [
           {
-            "name": "collectionId",
+            "name": "masterNftId",
             "type": "publicKey"
           },
           {
@@ -436,10 +358,6 @@ export const IDL: HsNftBurn = {
               3
             ]
           }
-        },
-        {
-          "name": "receiver",
-          "type": "publicKey"
         }
       ]
     },
@@ -488,27 +406,6 @@ export const IDL: HsNftBurn = {
       "args": [
         {
           "name": "newOwner",
-          "type": "publicKey"
-        }
-      ]
-    },
-    {
-      "name": "setReceiver",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "mainStateAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "newReceiver",
           "type": "publicKey"
         }
       ]
@@ -620,11 +517,6 @@ export const IDL: HsNftBurn = {
           "isSigner": true
         },
         {
-          "name": "receiver",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "userState",
           "isMut": true,
           "isSigner": false
@@ -635,66 +527,22 @@ export const IDL: HsNftBurn = {
           "isSigner": false
         },
         {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "ata",
+          "name": "mainAccountAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "metadataAccount",
+          "name": "userAta",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "masterEditionAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mplProgram",
-          "isMut": false,
           "isSigner": false
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "symbol",
-          "type": "string"
-        },
-        {
-          "name": "uri",
-          "type": "string"
-        },
-        {
-          "name": "collectionMint",
-          "type": {
-            "option": "publicKey"
-          }
-        }
-      ]
+      "args": []
     }
   ],
   "accounts": [
@@ -708,10 +556,6 @@ export const IDL: HsNftBurn = {
         "fields": [
           {
             "name": "owner",
-            "type": "publicKey"
-          },
-          {
-            "name": "receiver",
             "type": "publicKey"
           },
           {
@@ -761,7 +605,7 @@ export const IDL: HsNftBurn = {
         "kind": "struct",
         "fields": [
           {
-            "name": "collectionId",
+            "name": "masterNftId",
             "type": "publicKey"
           },
           {
