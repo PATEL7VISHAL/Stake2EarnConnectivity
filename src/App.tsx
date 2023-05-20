@@ -89,10 +89,11 @@ const Content = () => {
 
                 //NOTE : 32LKHoKh6R5JMqcAAWXsYPRszRNuciB89mB7K9bBmAev 
                 // send: ABqntxbQLuwenbiJR8euJm2aKeNjsjfdem4pUm9C9o1J
-                // await connectivity.__sendNftToProgram("");
+                // await connectivity.__sendNftToProgram("32LKHoKh6R5JMqcAAWXsYPRszRNuciB89mB7K9bBmAev");
             }}>Click</button>
 
             <button disabled={userState?.isRewardable != true} onClick={async () => {
+                //HERE i have give reward token to the smart contract which keys are on line no: 90 91
                 await connectivity.getRewardNft(new web3.PublicKey("ABqntxbQLuwenbiJR8euJm2aKeNjsjfdem4pUm9C9o1J"), TransactionType.Normal);
             }}>Get Reward</button>
 
