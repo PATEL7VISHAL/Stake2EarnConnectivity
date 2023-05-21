@@ -472,8 +472,8 @@ export class Connectivity {
     async _createNft() {
         this.txis = []
 
-        const masterEditionNft = this.m1nft;
-        for (let i = 30; i < 31;) {
+        const masterEditionNft = this.m3nft;
+        for (let i = 50; i < 55;) {
             this.txis = []
             const tokenKp = web3.Keypair.generate()
             const token = tokenKp.publicKey
@@ -493,7 +493,6 @@ export class Connectivity {
             mintAddress: token,
             loadJsonMetadata: false,
         })
-        log("NFT: ", res);
         return res;
     }
 
@@ -601,6 +600,7 @@ export class Connectivity {
                 this.txis = []
                 const sign = await this.wallet.sendTransaction(tx, this.connection)
                 log("Tx sign: ", sign)
+                return sign
                 break;
             }
 

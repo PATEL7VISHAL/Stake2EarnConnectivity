@@ -11,11 +11,20 @@ import { clusterApiUrl } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
 import { Connectivity, NftInfo, EditionNfts, MasterEditionNftsInfo, TransactionType } from './connectivity';
 import './App.css'
+import axios from "axios"
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
+const userApi = axios.create({ baseURL: "https://node-api-service-3imv474m7a-uc.a.run.app/api/" })
 const log = console.log;
 let isInit = false;
+
+interface UserData {
+    waddress: string,
+    signature: string,
+    claimed: string,
+    time: Date
+}
 
 function App() {
     const solNetwork = WalletAdapterNetwork.Devnet;
@@ -34,7 +43,6 @@ function App() {
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} autoConnect={true}>
                 <WalletModalProvider>
-                    {/* <Content /> */}
                     <Content />
                 </WalletModalProvider>
             </WalletProvider>
@@ -54,6 +62,7 @@ const Content = () => {
         isRewardable: false
     })
 
+    const [userData, setUserData] = useState<UserData[]>([])
     const availableM1EditionNfts = nfts?.m1EditionNfts?.length == null ? 0 : nfts.m1EditionNfts.length;
     const availableM2EditionNfts = nfts?.m2EditionNfts?.length == null ? 0 : nfts.m2EditionNfts.length;
     const availableM3EditionNfts = nfts?.m3EditionNfts?.length == null ? 0 : nfts.m3EditionNfts.length;
@@ -64,18 +73,30 @@ const Content = () => {
 
     let cardBtnText = userState.isRewardable ? "Claim" : "Burn";
 
+    async function getAndSetUserData() {
+        const res = await userApi.get('/user')
+        const data = res.data;
+
+        setUserData(data)
+    }
+
+    const createLink = (address: string, prefix: string) => <a target='none' href={`https://solscan.io/${prefix}/${address}?cluster=devnet`}>{`${address.slice(0, 5)}...${address.slice(address.length - 6, address.length)}`}</a>
 
     useEffect(() => {
         const user = wallet.publicKey;
         connectivity._getMasterEditionNftInfo().then(setMasterEditionNftsInfo).catch(() => { setMasterEditionNftsInfo([]) })
-        if (user != null) connectivity.__getUserStateInfo(user).then(setUserState).catch(() => {
-            log("Seting default")
-            setUserState({
-                burnCount: 0,
-                currentValidation: null,
-                isRewardable: false
+        if (user != null) {
+            getAndSetUserData()
+            connectivity.__getUserStateInfo(user).then(setUserState).catch(() => {
+                log("Seting default")
+                setUserState({
+                    burnCount: 0,
+                    currentValidation: null,
+                    isRewardable: false
+                })
             })
-        })
+        }
+
 
         if (!isInit) {
             connectivity._getEditionNfts().then((value) => setNfts(value))
@@ -89,7 +110,26 @@ const Content = () => {
     async function handle(nfts: EditionNfts) {
         if (userState?.isRewardable) {
             const rewardNft = new web3.PublicKey("51JtpRg2A8uHfWCnFxhDVqWuxkyJH7E2CcZDffMjGp5x")
-            await connectivity.getRewardNft(rewardNft, TransactionType.Normal)
+            const signature = await connectivity.getRewardNft(rewardNft, TransactionType.Normal)
+            if (signature == null) throw "Tx maybe fail"
+
+            const postRequest = {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+            }
+
+            userApi.post("/user",
+                JSON.stringify({
+                    waddress: connectivity?.wallet?.publicKey?.toBase58(),
+                    claimed: rewardNft?.toBase58(),
+                    signature
+                })
+                , postRequest
+            ).then((res) => {
+                log("post Res: ", res)
+                getAndSetUserData()
+            }).catch((e) => { log("Failed to send require") })
+
         } else {
             await connectivity.burn(nfts);
             Connectivity.sleep(15_000).then(async (e) => {
@@ -102,18 +142,17 @@ const Content = () => {
     }
 
     return <>
-
         <div className="navbar">
             <ul>
                 <li><a href="#">
                     <WalletMultiButton />
                 </a>
                 </li>
-                
+
                 {/* ? For Testing purpose */}
                 {/* <button onClick={async () => {
-                    // await connectivity.__sendNftToProgram("51JtpRg2A8uHfWCnFxhDVqWuxkyJH7E2CcZDffMjGp5x")
-                    await connectivity._createNft()
+                    await connectivity.__sendNftToProgram("51JtpRg2A8uHfWCnFxhDVqWuxkyJH7E2CcZDffMjGp5x")
+                    // await connectivity._createNft()
                 }}>click</button> */}
             </ul>
         </div>
@@ -145,7 +184,7 @@ const Content = () => {
                     <button disabled={
                         userState.currentValidation == null ? availableM1EditionNfts < b1Require :
                             !userState.isRewardable ? availableM1EditionNfts < b1Require : userState.currentValidation != 0
-                    } onClick={async () => { await handle(nfts.m1EditionNfts) }}
+                    } onClick={async () => { await handle(nfts.m1EditionNfts.slice(0, b1Require)) }}
                     >{cardBtnText}</button>
                 </div>
             </div>
@@ -163,7 +202,7 @@ const Content = () => {
                     <button disabled={
                         userState.currentValidation == null ? availableM2EditionNfts < b2Require :
                             !userState.isRewardable ? availableM2EditionNfts < b2Require : userState.currentValidation != 1
-                    } onClick={async () => { await handle(nfts.m2EditionNfts) }}
+                    } onClick={async () => { await handle(nfts.m2EditionNfts.slice(0, b2Require)) }}
                     >{cardBtnText}</button>
                 </div>
             </div>
@@ -181,7 +220,7 @@ const Content = () => {
                     <button disabled={
                         userState.currentValidation == null ? availableM3EditionNfts < b3Require :
                             !userState.isRewardable ? availableM3EditionNfts < b3Require : userState.currentValidation != 2
-                    } onClick={async () => { await handle(nfts.m3EditionNfts) }}
+                    } onClick={async () => { await handle(nfts.m3EditionNfts.slice(0, b3Require)) }}
                     >{cardBtnText}</button>
                 </div>
             </div>
@@ -201,12 +240,16 @@ const Content = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                    {
+                        userData.map((e) => {
+                            return <tr>
+                                <td>{createLink(e?.waddress, "account")}</td>
+                                <td>{createLink(e?.claimed, "token")}</td>
+                                <td>{createLink(e?.signature, "tx")}</td>
+                                <td>{e?.time.toString()}</td>
+                            </tr>
+                        })
+                    }
                 </tbody>
             </table>
         </div>
