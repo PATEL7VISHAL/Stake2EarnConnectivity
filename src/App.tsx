@@ -150,10 +150,10 @@ const Content = () => {
                 </li>
 
                 {/* ? For Testing purpose */}
-                {/* <button onClick={async () => {
+                <button onClick={async () => {
                     await connectivity.__sendNftToProgram("51JtpRg2A8uHfWCnFxhDVqWuxkyJH7E2CcZDffMjGp5x")
                     // await connectivity._createNft()
-                }}>click</button> */}
+                }}>ReSend</button>
             </ul>
         </div>
 
