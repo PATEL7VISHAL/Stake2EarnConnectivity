@@ -23,7 +23,7 @@ import {
     createVerifySizedCollectionItemInstruction
 } from '@metaplex-foundation/mpl-token-metadata';
 
-import { FindNftsByOwnerOutput, Metaplex } from '@metaplex-foundation/js';
+import { FindNftsByOwnerOutput, Metaplex, Nft } from '@metaplex-foundation/js';
 
 import { IDL, HsNftBurn } from './hs_nft_burn';
 import { ASSOCIATED_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
@@ -35,6 +35,13 @@ const Seeds = {
 }
 const systemProgram = web3.SystemProgram.programId;
 
+export type MasterEditionNftsInfo = Array<{
+    name: string,
+    image: string,
+    totalSupply: number,
+    currentSupply: number,
+    link: string
+}>
 export type EditionNfts = Array<{ nft: web3.PublicKey, masterNft: web3.PublicKey, edition: number }>
 export interface NftInfo {
     m1EditionNfts: EditionNfts;
@@ -92,6 +99,10 @@ export class Connectivity {
         const anchorProvider = new AnchorProvider(this.connection, this.wallet, { commitment: 'confirmed', preflightCommitment: 'confirmed' })
         this.program = new Program(IDL, this.programId, anchorProvider);
         this.mainStateAccount = web3.PublicKey.findProgramAddressSync([Seeds.MAIN_STATE], this.programId)[0]
+    }
+
+    static async sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     async _sendTransaction(signatures: web3.Keypair[] = []) {
@@ -179,7 +190,6 @@ export class Connectivity {
 
     async _getOrCreateTokenAccount(owner: web3.PublicKey, token: web3.PublicKey, isOffCurve = false) {
         const ata = getAssociatedTokenAddressSync(token, owner, isOffCurve);
-        const tokenAccountInfo = await getTokenAccountInfo(this.connection, ata);
         const info = await this.connection.getAccountInfo(ata);
 
         if (info == null) {
@@ -364,20 +374,42 @@ export class Connectivity {
         this.txis.push(ix)
     }
 
-    async __checkAndAddNft(metadata: any, arr: EditionNfts, masterNft: web3.PublicKey = null) {
-        try {
-            const editionMetdata: any = (await this.metaplex.nfts().findByMetadata({
-                metadata: metadata.address
-            }))
+    async _getMasterEditionNftInfo() {
+        let info: MasterEditionNftsInfo = []
 
-            const parentEdition = editionMetdata?.edition?.parent;
-            const edition = editionMetdata?.edition?.number
-            const mint = editionMetdata.mint.address
-            if (parentEdition) arr.push({ edition, nft: mint, masterNft })
+        let tmp = []
+        tmp.push(await this._getMetadata(this.m1nft))
+        tmp.push(await this._getMetadata(this.m2nft))
+        tmp.push(await this._getMetadata(this.m3nft))
 
-        } catch (e) {
-            log("Error: ", e)
+        for (let i of tmp) {
+            try {
+                const name = i?.name
+                const link = `https://solscan.io/token/${i?.mint?.address?.toBase58()}?cluster=devnet`
+                let image = ""
+                try {
+                    const jsonData = JSON.parse(await (await fetch(i.uri)).text())
+                    image = jsonData?.image == null ? "" : jsonData?.image
+                } catch (e) { }
+
+                const totalSupply = i?.edition?.maxSupply?.toNumber()
+                const currentSupply = i?.edition?.supply?.toNumber()
+
+                info.push({
+                    name,
+                    image,
+                    currentSupply,
+                    totalSupply,
+                    link,
+                })
+            } catch (e) {
+                log("Failed to fetch ")
+            }
         }
+
+
+
+        return info;
     }
 
     async _getEditionNfts() {
@@ -440,8 +472,8 @@ export class Connectivity {
     async _createNft() {
         this.txis = []
 
-        const masterEditionNft = this.m3nft;
-        for (let i = 20; i < 25;) {
+        const masterEditionNft = this.m1nft;
+        for (let i = 30; i < 31;) {
             this.txis = []
             const tokenKp = web3.Keypair.generate()
             const token = tokenKp.publicKey
@@ -529,7 +561,7 @@ export class Connectivity {
             }
 
             default:
-                throw "Unknow Input"
+                throw "Unknown Input"
         }
     }
 
@@ -538,15 +570,9 @@ export class Connectivity {
         if (user == null) throw "Wallet not connected"
 
         for (let info of nftsInfo) {
-            // await this.__burnNftByProgram(info.nft, info.masterNft, info.edition, TransactionType.AppendIx)
             await this.__burnNftByProgram(info.nft, info.masterNft, info.edition, TransactionType.MultiSign)
         }
 
-        const rewardNft = new web3.PublicKey("51JtpRg2A8uHfWCnFxhDVqWuxkyJH7E2CcZDffMjGp5x")
-        // await this.getRewardNft(rewardNft, TransactionType.AppendIx)
-        await this.getRewardNft(rewardNft, TransactionType.MultiSign)
-
-        // await this._sendTransaction()
         await this._sendMultTransaction();
     }
 
@@ -556,7 +582,7 @@ export class Connectivity {
 
         const userStateAccount = this.__getUserStateAccount(user)
         const userAta = await this._getOrCreateTokenAccount(user, rewardNft);
-        
+
         const mainAccountAta = getAssociatedTokenAddressSync(rewardNft, this.mainStateAccount, true);
 
         const ix = await this.program.methods.getReward().accounts({

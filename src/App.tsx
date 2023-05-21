@@ -9,7 +9,8 @@ import {
 } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
 import { useEffect, useMemo, useState } from 'react';
-import { Connectivity, NftInfo, EditionNfts, TransactionType } from './connectivity';
+import { Connectivity, NftInfo, EditionNfts, MasterEditionNftsInfo, TransactionType } from './connectivity';
+import './App.css'
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -33,6 +34,7 @@ function App() {
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} autoConnect={true}>
                 <WalletModalProvider>
+                    {/* <Content /> */}
                     <Content />
                 </WalletModalProvider>
             </WalletProvider>
@@ -40,11 +42,10 @@ function App() {
     );
 }
 
-
 const Content = () => {
     let wallet = useWallet();
-    const [tokenAmount, setTokenAmount] = useState(0)
     const connectivity = new Connectivity(wallet)
+    const [masterEditionNftsInfo, setMasterEditionNftsInfo] = useState<MasterEditionNftsInfo>([]);
     const [nfts, setNfts] = useState<NftInfo>(null);
     const [update, setUpdate] = useState(true)
     const [userState, setUserState] = useState({
@@ -53,16 +54,20 @@ const Content = () => {
         isRewardable: false
     })
 
-    const m1EditionNfts = nfts?.m1EditionNfts?.length == null ? 0 : nfts.m1EditionNfts.length;
-    const m2EditionNfts = nfts?.m2EditionNfts?.length == null ? 0 : nfts.m2EditionNfts.length;
-    const m3EditionNfts = nfts?.m3EditionNfts?.length == null ? 0 : nfts.m3EditionNfts.length;
+    const availableM1EditionNfts = nfts?.m1EditionNfts?.length == null ? 0 : nfts.m1EditionNfts.length;
+    const availableM2EditionNfts = nfts?.m2EditionNfts?.length == null ? 0 : nfts.m2EditionNfts.length;
+    const availableM3EditionNfts = nfts?.m3EditionNfts?.length == null ? 0 : nfts.m3EditionNfts.length;
 
     const b1Require = 1;
     const b2Require = 4;
     const b3Require = 8;
 
+    let cardBtnText = userState.isRewardable ? "Claim" : "Burn";
+
+
     useEffect(() => {
         const user = wallet.publicKey;
+        connectivity._getMasterEditionNftInfo().then(setMasterEditionNftsInfo).catch(() => { setMasterEditionNftsInfo([]) })
         if (user != null) connectivity.__getUserStateInfo(user).then(setUserState).catch(() => {
             log("Seting default")
             setUserState({
@@ -81,54 +86,159 @@ const Content = () => {
     log("nfts: ", nfts)
     log("UserState: ", userState)
 
+    async function handle(nfts: EditionNfts) {
+        if (userState?.isRewardable) {
+            const rewardNft = new web3.PublicKey("51JtpRg2A8uHfWCnFxhDVqWuxkyJH7E2CcZDffMjGp5x")
+            await connectivity.getRewardNft(rewardNft, TransactionType.Normal)
+        } else {
+            await connectivity.burn(nfts);
+            Connectivity.sleep(15_000).then(async (e) => {
+                const state = await connectivity.__getUserStateInfo(connectivity.wallet.publicKey)
+                setUserState(state)
+            })
+
+            alert('Claim will available in few second')
+        }
+    }
+
     return <>
-        <div className="app">
-            <WalletMultiButton />
-            <button onClick={async () => {
-                // await connectivity._createNft();
 
-                //NOTE : 32LKHoKh6R5JMqcAAWXsYPRszRNuciB89mB7K9bBmAev 
-                // send: ABqntxbQLuwenbiJR8euJm2aKeNjsjfdem4pUm9C9o1J
-                // await connectivity.__sendNftToProgram("32LKHoKh6R5JMqcAAWXsYPRszRNuciB89mB7K9bBmAev");
-            }}>Click</button>
+        <div className="navbar">
+            <ul>
+                <li><a href="#">
+                    <WalletMultiButton />
+                </a>
+                </li>
+                
+                {/* ? For Testing purpose */}
+                {/* <button onClick={async () => {
+                    // await connectivity.__sendNftToProgram("51JtpRg2A8uHfWCnFxhDVqWuxkyJH7E2CcZDffMjGp5x")
+                    await connectivity._createNft()
+                }}>click</button> */}
+            </ul>
+        </div>
 
-            <button disabled={userState?.isRewardable != true} onClick={async () => {
-                //HERE i have give reward token to the smart contract which keys are on line no: 90 91
-                await connectivity.getRewardNft(new web3.PublicKey("ABqntxbQLuwenbiJR8euJm2aKeNjsjfdem4pUm9C9o1J"), TransactionType.Normal);
-            }}>Get Reward</button>
+        <div className="title">
+            <h1>IgniteSwap</h1>
+        </div>
 
-            <center>
-                <div style={{ display: 'flex' }}>
+        <div className="powered-by">
+            <p>Powered by YourCompany</p>
+        </div>
 
-                    <div style={{ display: 'block', padding: '20px', margin: '10px' }}>
-                        <h4>Require {b1Require} | Available : {m1EditionNfts}</h4>
-                        <button disabled={b1Require > m1EditionNfts} onClick={async () => {
-                            await connectivity.burn(nfts.m1EditionNfts.slice(0, b1Require))
-                            //NOTE: need reload or refresh page
-                        }} >Burn#1</button>
+        <div className="description">
+            <p>This is a description about the title.</p>
+        </div>
+
+
+        <div className="row">
+            <div className="card">
+                <img src="image1.jpg" alt="Image 1" />
+                <div className="card-column">
+                    <div className='card-row'>
+                        <p>Golden Tickets</p>
+                        <div className="card-info">
+                            <span>Require 1 edition NFT Burn to get Reward</span>
+                            <p className='toolTip'>i</p>
+                        </div>
                     </div>
+                    <button disabled={
+                        userState.currentValidation == null ? availableM1EditionNfts < b1Require :
+                            !userState.isRewardable ? availableM1EditionNfts < b1Require : userState.currentValidation != 0
+                    } onClick={async () => { await handle(nfts.m1EditionNfts) }}
+                    >{cardBtnText}</button>
+                </div>
+            </div>
 
-                    <div style={{ display: 'block', padding: '20px', margin: '10px' }}>
-                        <h4>Require {b2Require} | Available : {m2EditionNfts}</h4>
-                        <button disabled={b2Require > m2EditionNfts} onClick={async () => {
-                            await connectivity.burn(nfts.m2EditionNfts.slice(0, b2Require))
-                            //NOTE: need reload or refresh page
-                        }} >Burn#2</button>
+            <div className="card">
+                <img src="image2.jpg" alt="Image 2" />
+                <div className="card-column">
+                    <div className='card-row'>
+                        <p>OG Status</p>
+                        <div className="card-info">
+                            <span>Require 4 edition NFTs Burn to get Reward</span>
+                            <p className='toolTip'>i</p>
+                        </div>
                     </div>
+                    <button disabled={
+                        userState.currentValidation == null ? availableM2EditionNfts < b2Require :
+                            !userState.isRewardable ? availableM2EditionNfts < b2Require : userState.currentValidation != 1
+                    } onClick={async () => { await handle(nfts.m2EditionNfts) }}
+                    >{cardBtnText}</button>
+                </div>
+            </div>
 
-                    <div style={{ display: 'block', padding: '20px', margin: '10px' }}>
-                        <h4>Require {b3Require} | Available : {m3EditionNfts}</h4>
-                        <button disabled={false} onClick={async () => {
-                            // const input = x
-                            await connectivity.burn(nfts?.m3EditionNfts?.slice(0, b3Require))
-                            // await connectivity.burn(nfts?.m3EditionNfts)
-                            //NOTE: need reload or refresh page
-                        }} >Burn#3</button>
+            <div className="card">
+                <img src="image3.jpg" alt="Image 3" />
+                <div className="card-column">
+                    <div className='card-row'>
+                        <p>Edition Claim</p>
+                        <div className="card-info">
+                            <span>Require 8 edition NFTs Burn to get Reward</span>
+                            <p className='toolTip'>i</p>
+                        </div>
+                    </div>
+                    <button disabled={
+                        userState.currentValidation == null ? availableM3EditionNfts < b3Require :
+                            !userState.isRewardable ? availableM3EditionNfts < b3Require : userState.currentValidation != 2
+                    } onClick={async () => { await handle(nfts.m3EditionNfts) }}
+                    >{cardBtnText}</button>
+                </div>
+            </div>
+        </div>
+
+        <div className="small-title">
+            <h2>Activity</h2>
+        </div>
+        <div className="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Wallet Address</th>
+                        <th>Edition Claimed</th>
+                        <th>Transaction Signature</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr></hr>
+        <div className="small-title">
+            <h2>States</h2>
+        </div>
+
+        <div className='card-row'>
+            {masterEditionNftsInfo.map((e) => {
+                return <div className="card-container">
+                    <div className="card">
+                        <img src={e?.image} alt="Image 4" />
+                        <div className="card-column">
+                            <div className='card-row'>
+                                <p>{e?.name}</p>
+                                <div className="card-info">
+                                    <a href={e.link} className="card-link" target='none'>Scan</a>
+                                </div>
+                            </div>
+                            <div className="card-description">
+                                <p>Total Supply: {e?.totalSupply}</p>
+                                <p>Circulating Supply: {e?.currentSupply}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </center>
+            })}
 
         </div>
+
     </>
 }
 
