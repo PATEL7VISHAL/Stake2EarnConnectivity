@@ -76,8 +76,8 @@ const Content = () => {
     async function getAndSetUserData() {
         const res = await userApi.get('/user')
         const data = res.data;
-
-        setUserData(data)
+        if (data == null) return
+        setUserData(data.slice(0, 4))
     }
 
     const createLink = (address: string, prefix: string) => <a target='none' href={`https://solscan.io/${prefix}/${address}?cluster=devnet`}>{`${address.slice(0, 5)}...${address.slice(address.length - 6, address.length)}`}</a>
