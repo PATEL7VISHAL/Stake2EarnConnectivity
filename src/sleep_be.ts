@@ -59,28 +59,7 @@ export type SleepBe = {
       ]
     },
     {
-      "name": "initUserState",
-      "accounts": [
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initNftStakeState",
+      "name": "initNftState",
       "accounts": [
         {
           "name": "user",
@@ -93,7 +72,28 @@ export type SleepBe = {
           "isSigner": false
         },
         {
-          "name": "nftStakeStateAccount",
+          "name": "nftStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initUserState",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userStateAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -124,7 +124,7 @@ export type SleepBe = {
           "isSigner": false
         },
         {
-          "name": "nftStakeStateAccount",
+          "name": "nftStateAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -182,7 +182,7 @@ export type SleepBe = {
           "isSigner": false
         },
         {
-          "name": "nftStakeStateAccount",
+          "name": "nftStateAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -239,6 +239,108 @@ export type SleepBe = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "sellNft",
+      "accounts": [
+        {
+          "name": "seller",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftMetadataAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "buyNft",
+      "accounts": [
+        {
+          "name": "buyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "seller",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "buyerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -271,27 +373,47 @@ export type SleepBe = {
             "type": "u64"
           },
           {
+            "name": "totalSoldNft",
+            "type": "u64"
+          },
+          {
             "name": "currentStaked",
+            "type": "u64"
+          },
+          {
+            "name": "currentInMarketplace",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "nftStakeState",
+      "name": "nftState",
       "docs": [
-        "SEEDS: SEED_NFT_STAKE_STATE + MINT.key().as_ref()"
+        "SEEDS: SEED_NFT_STATE + MINT.key().as_ref()"
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "owner",
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "currentOwner",
             "type": "publicKey"
           },
           {
             "name": "isInStake",
             "type": "bool"
+          },
+          {
+            "name": "isInMarketplace",
+            "type": "bool"
+          },
+          {
+            "name": "price",
+            "type": "u64"
           },
           {
             "name": "stakeInTime",
@@ -415,6 +537,36 @@ export type SleepBe = {
       "code": 6009,
       "name": "UnAuthorized",
       "msg": "You don't have authority"
+    },
+    {
+      "code": 6010,
+      "name": "NftInMarketplace",
+      "msg": "Nft is in marketplace"
+    },
+    {
+      "code": 6011,
+      "name": "NftInStaking",
+      "msg": "Nft is in staking"
+    },
+    {
+      "code": 6012,
+      "name": "AlreadyInMarketplace",
+      "msg": "Nft is in marketplace"
+    },
+    {
+      "code": 6013,
+      "name": "NftNotInMarketplace",
+      "msg": "Nft not found in marketPlace"
+    },
+    {
+      "code": 6014,
+      "name": "SelfSelling",
+      "msg": "Self Selling of nft not allow"
+    },
+    {
+      "code": 6015,
+      "name": "SellerMissMatch",
+      "msg": "Seller MissMatch"
     }
   ]
 };
@@ -480,28 +632,7 @@ export const IDL: SleepBe = {
       ]
     },
     {
-      "name": "initUserState",
-      "accounts": [
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initNftStakeState",
+      "name": "initNftState",
       "accounts": [
         {
           "name": "user",
@@ -514,7 +645,28 @@ export const IDL: SleepBe = {
           "isSigner": false
         },
         {
-          "name": "nftStakeStateAccount",
+          "name": "nftStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initUserState",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userStateAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -545,7 +697,7 @@ export const IDL: SleepBe = {
           "isSigner": false
         },
         {
-          "name": "nftStakeStateAccount",
+          "name": "nftStateAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -603,7 +755,7 @@ export const IDL: SleepBe = {
           "isSigner": false
         },
         {
-          "name": "nftStakeStateAccount",
+          "name": "nftStateAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -660,6 +812,108 @@ export const IDL: SleepBe = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "sellNft",
+      "accounts": [
+        {
+          "name": "seller",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftMetadataAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "buyNft",
+      "accounts": [
+        {
+          "name": "buyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "seller",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "buyerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -692,27 +946,47 @@ export const IDL: SleepBe = {
             "type": "u64"
           },
           {
+            "name": "totalSoldNft",
+            "type": "u64"
+          },
+          {
             "name": "currentStaked",
+            "type": "u64"
+          },
+          {
+            "name": "currentInMarketplace",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "nftStakeState",
+      "name": "nftState",
       "docs": [
-        "SEEDS: SEED_NFT_STAKE_STATE + MINT.key().as_ref()"
+        "SEEDS: SEED_NFT_STATE + MINT.key().as_ref()"
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "owner",
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "currentOwner",
             "type": "publicKey"
           },
           {
             "name": "isInStake",
             "type": "bool"
+          },
+          {
+            "name": "isInMarketplace",
+            "type": "bool"
+          },
+          {
+            "name": "price",
+            "type": "u64"
           },
           {
             "name": "stakeInTime",
@@ -836,6 +1110,36 @@ export const IDL: SleepBe = {
       "code": 6009,
       "name": "UnAuthorized",
       "msg": "You don't have authority"
+    },
+    {
+      "code": 6010,
+      "name": "NftInMarketplace",
+      "msg": "Nft is in marketplace"
+    },
+    {
+      "code": 6011,
+      "name": "NftInStaking",
+      "msg": "Nft is in staking"
+    },
+    {
+      "code": 6012,
+      "name": "AlreadyInMarketplace",
+      "msg": "Nft is in marketplace"
+    },
+    {
+      "code": 6013,
+      "name": "NftNotInMarketplace",
+      "msg": "Nft not found in marketPlace"
+    },
+    {
+      "code": 6014,
+      "name": "SelfSelling",
+      "msg": "Self Selling of nft not allow"
+    },
+    {
+      "code": 6015,
+      "name": "SellerMissMatch",
+      "msg": "Seller MissMatch"
     }
   ]
 };

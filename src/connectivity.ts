@@ -1,5 +1,5 @@
-import { AnchorProvider, Program, web3 } from '@project-serum/anchor';
-import { utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes';
+import { AnchorProvider, Program, web3, BN } from '@project-serum/anchor';
+import { base64, utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes';
 import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddressSync,
@@ -7,11 +7,12 @@ import {
 } from '@solana/spl-token';
 import { WalletContextState } from "@solana/wallet-adapter-react";
 
-import { Metaplex, Nft, Sft, Metadata } from '@metaplex-foundation/js';
+import { Metaplex, Nft, Sft, Metadata, toAccountInfo } from '@metaplex-foundation/js';
 import { PROGRAM_ID as MPL_ID } from '@metaplex-foundation/mpl-token-metadata';
 
 import { TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
 import { IDL, SleepBe } from './sleep_be';
+import axios from 'axios';
 
 const log = console.log;
 const systemProgram = web3.SystemProgram.programId;
@@ -21,9 +22,9 @@ export enum TransactionType {
     MultiSign,
 }
 const Seeds = {
-    SEED_MAIN_STATE: utf8.encode("mainState"),
-    SEED_USER_STATE: utf8.encode("userState"),
-    SEED_NFT_STAKE_STATE: utf8.encode("nftState"),
+    SEED_MAIN_STATE: utf8.encode("main_state"),
+    SEED_USER_STATE: utf8.encode("user_state"),
+    SEED_NFT_STATE: utf8.encode("nft_state"),
 }
 
 export enum StakingDuration {
@@ -32,7 +33,20 @@ export enum StakingDuration {
     STAKING_FOR_60_DAYS,
 }
 
-export interface StakeNftInfo {
+export interface NftState {
+    currentOwner: string,
+    isInstake: boolean,
+    stakeInTime: number | null,
+    stakingType: { variant1?: {}; variant2?: {}; variant3?: {}; unknown?: {}; } | null,
+    releaseDate: Date | null,
+    minStakingDuration: number | null,
+    isInMarketplace: boolean,
+    price: number | null,
+}
+
+export interface NftInfo {
+    mint: string,
+    nftState: NftState | null,
     name: string,
     symbol: string,
     uri: string,
@@ -82,6 +96,7 @@ export class Connectivity {
             const res = await this.wallet.sendTransaction(tx, this.connection, { signers: signatures, preflightCommitment: 'confirmed' });
             log("Trasaction Sign: ", res);
             alert("Trasaction Sussessful")
+            return res;
         } catch (e) {
             log("Error: ", e);
             alert("Trasaction Fail")
@@ -141,10 +156,13 @@ export class Connectivity {
 
         const state = {
             owner: res.owner.toBase58(),
-            stakeNftOwner: res.stakeNftOwner.toBase58(),
+            receiver: res.receiver.toBase58(),
             rewardFee: res.rewardFee.toNumber(),
+            stakeNftOwner: res.stakeNftOwner.toBase58(),
             totalStaked: res.totalStaked.toNumber(),
-            currentStaked: res.currentStaked.toNumber()
+            totalSoldNft: res.totalSoldNft.toNumber(),
+            currentStaked: res.currentStaked.toNumber(),
+            currentInMarketplace: res.currentInMarketplace.toNumber()
         }
 
         return state;
@@ -176,17 +194,14 @@ export class Connectivity {
         return userStateAccount
     }
 
-    __getNftStakeStateAccount(nft: web3.PublicKey) {
+    __getNftStateAccount(nft: web3.PublicKey) {
         return web3.PublicKey.findProgramAddressSync([
-            Seeds.SEED_NFT_STAKE_STATE,
+            Seeds.SEED_NFT_STATE,
             nft.toBuffer(),
         ], this.programId)[0]
     }
 
-    async __getNftStakeStateInfo(nft: web3.PublicKey | string) {
-        if (typeof nft == "string") nft = new web3.PublicKey(nft)
-        const nftStateAccount = this.__getNftStakeStateAccount(nft)
-        const state = await this.program.account.nftStakeState.fetch(nftStateAccount);
+    static __parseNftStateRes(state: any): NftState | null {
         const stakeInTime = state.stakeInTime.toNumber();
         const stakingType = state.stakingType
 
@@ -202,57 +217,142 @@ export class Connectivity {
         //?DAYs Calculation (TESTING)
         // const releaseDate = new Date((stakeInTime + (minStakingDuration * 60 * 60)) * 1000)
 
-        const parse = {
-            owner: state.isInStake ? state.owner.toBase58() : null,
+        const parseValue = {
+            currentOwner: state.currentOwner.toBase58(),
             isInstake: state.isInStake,
             stakeInTime: state.isInStake ? stakeInTime : null,
             stakingType: state.isInStake ? stakingType : null,
-            minStakingDuration: state.isInStake ? minStakingDuration : null,
             releaseDate: state.isInStake ? releaseDate : null,
+            minStakingDuration: state.isInStake ? minStakingDuration : null,
+            isInMarketplace: state.isInMarketplace,
+            price: state.isInMarketplace ? (state.price.toNumber() / 1000_000_000) : null,
         }
-        return parse
+        return parseValue
     }
 
-    async getStakedNft() {
-        const user = this.wallet.publicKey;
-        if (user == null) return []
-        const userStateAccount = this.__getUserStateAccount(user)
+    __getNftStateInfoFromBuffer(data: Buffer): NftState | null {
+        try {
+            const state = this.program.coder.accounts.decode("nftState", data)
 
-        const res = await this.metaplex.nfts().findAllByOwner({
-            owner: userStateAccount
+            const nftState = Connectivity.__parseNftStateRes(state);
+            return nftState
+        } catch { return null }
+    }
+
+    async __getNftStateInfo(nft: web3.PublicKey | string): Promise<NftState> {
+        try {
+            if (typeof nft == "string") nft = new web3.PublicKey(nft)
+            const nftStateAccount = this.__getNftStateAccount(nft)
+            const state = await this.program.account.nftState.fetch(nftStateAccount);
+
+            const nftState = Connectivity.__parseNftStateRes(state);
+            return nftState
+        } catch { return null }
+    }
+
+    async __getNftOwnedByAccount(owner: web3.PublicKey) {
+        const nfts: any = await this.metaplex.nfts().findAllByOwner({
+            owner
         });
 
-        let verifiedNft: StakeNftInfo[] = [];
-        for (let i of res) {
+        let verifiedStakedNft: NftInfo[] = [];
+        let stateAccountsInfoReqData = [];
+        for (let i of nfts) {
             try {
                 const creator = i?.creators[0];
-                if (creator.verified && creator.address.toBase58() == this.stakeNftCreator.toBase58()) verifiedNft.push({
-                    name: i.name,
-                    image: "",
-                    symbol: i.symbol,
-                    uri: i.uri,
-                })
+                if (creator.verified && creator.address.toBase58() == this.stakeNftCreator.toBase58()) {
+                    //? create data for api call 
+                    const nftStateAccount = this.__getNftStateAccount(i?.mintAddress);
+                    stateAccountsInfoReqData.push({
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "getAccountInfo",
+                        "params": [
+                            nftStateAccount.toBase58(),
+                            {
+                                "encoding": "jsonParsed", //? Here it's require encoding in jsonParsed
+                                "commitment": "confirmed"
+                            }
+                        ]
+                    })
+
+                    verifiedStakedNft.push({
+                        mint: i?.mintAddress?.toBase58(),
+                        nftState: null,
+                        name: i.name,
+                        symbol: i.symbol,
+                        image: "",
+                        uri: i.uri,
+                    })
+                }
             } catch { continue; }
         }
 
-        return verifiedNft;
+        try {
+            if (stateAccountsInfoReqData.length > 0) {
+                const res = await axios.post(this.connection.rpcEndpoint, stateAccountsInfoReqData, { headers: { "Content-Type": "application/json" } })
+                const data = res?.data;
+
+                let index = 0;
+                for (let i of data) {
+                    try {
+                        let a = [];
+                        const dataStr = i?.result?.value?.data?.at(0);
+                        if (dataStr == null) continue;
+                        const buffer = base64.decode(dataStr)
+                        const nftState = this.__getNftStateInfoFromBuffer(buffer)
+                        verifiedStakedNft[index].nftState = nftState
+                    } catch (e) {
+                        // log
+                    } finally {
+                        index += 1;
+                    }
+                }
+            }
+        } catch (e) {
+            log("Error! to fetch NftStates:  ", e)
+        }
+
+        return verifiedStakedNft;
+    }
+
+    async getNftOnMarketPlace() {
+        const info = await this.__getNftOwnedByAccount(this.mainStateAccount);
+        return info
+    }
+
+    async getUserNftsInfo(): Promise<NftInfo[]> {
+        const user = this.wallet.publicKey;
+        if (user == null) throw "Wallet id not found"
+
+        const info = await this.__getNftOwnedByAccount(user);
+        return info
+    }
+
+    async getStakedNftsInfo(): Promise<NftInfo[]> {
+        const user = this.wallet.publicKey;
+        if (user == null) throw "Wallet id not found"
+        const userState = this.__getUserStateAccount(user);
+
+        const info = await this.__getNftOwnedByAccount(userState);
+        return info
     }
 
     async __getOrInitNftStateAccount(nft: web3.PublicKey) {
-        let nftStakeStateAccount = this.__getNftStakeStateAccount(nft);
-        let info = await this.connection.getAccountInfo(nftStakeStateAccount);
+        let nftStateAccount = this.__getNftStateAccount(nft);
+        let info = await this.connection.getAccountInfo(nftStateAccount);
 
         if (info == null) {
-            const ix = await this.program.methods.initNftStakeState().accounts({
+            const ix = await this.program.methods.initNftState().accounts({
                 mint: nft,
                 user: this.wallet.publicKey,
                 systemProgram,
-                nftStakeStateAccount,
+                nftStateAccount,
             }).instruction()
             this.txis.push(ix)
         }
 
-        return nftStakeStateAccount;
+        return nftStateAccount;
     }
 
     async _getOrCreateTokenAccount(mint: web3.PublicKey, owner: web3.PublicKey, isOffCurve = false) {
@@ -290,10 +390,10 @@ export class Connectivity {
         )[0]
     }
 
-    async _getMetadata(token: web3.PublicKey) {
+    async _getMetadata(token: web3.PublicKey, loadJsonMetadata: boolean = false) {
         const res = await this.metaplex.nfts().findByMint({
             mintAddress: token,
-            loadJsonMetadata: false,
+            loadJsonMetadata,
         })
         return res;
     }
@@ -307,8 +407,8 @@ export class Connectivity {
         const nftMetadataAccount = this.__getMetadataAccount(nft)
         const userStateAccount = await this.__getOrInitUserStateAccount(user);
         const userStateAta = await this._getOrCreateTokenAccount(nft, userStateAccount, true);
-        const nftStakeStateAccount = await this.__getOrInitNftStateAccount(nft);
-        let variantType: { variant1?: {}; variant2?: {}; variant3?: {}; };
+        const nftStateAccount = await this.__getOrInitNftStateAccount(nft);
+        let variantType: { variant1?: {}; variant2?: {}; variant3?: {}; unknown?: {}; };
 
         switch (stakingDuration) {
             case 0:
@@ -330,7 +430,7 @@ export class Connectivity {
             nft,
             mainStateAccount: this.mainStateAccount,
             nftMetadataAccount,
-            nftStakeStateAccount,
+            nftStateAccount,
             tokenProgram: TOKEN_PROGRAM_ID,
             user,
             userAta,
@@ -351,13 +451,13 @@ export class Connectivity {
         const nftMetadataAccount = this.__getMetadataAccount(nft)
         const userStateAccount = this.__getUserStateAccount(user);
         const userStateAta = getAssociatedTokenAddressSync(nft, userStateAccount, true);
-        const nftStakeStateAccount = this.__getNftStakeStateAccount(nft);
+        const nftStateAccount = this.__getNftStateAccount(nft);
 
         const ix = await this.program.methods.unstakeNft().accounts({
             nft,
             mainStateAccount: this.mainStateAccount,
             nftMetadataAccount,
-            nftStakeStateAccount,
+            nftStateAccount,
             tokenProgram: TOKEN_PROGRAM_ID,
             user,
             userAta,
@@ -371,6 +471,7 @@ export class Connectivity {
 
     async payFeeForReward() {
         const user = this.wallet.publicKey;
+        if (user == null) throw "Wallet id not found"
         let ix = await this.program.methods.payFee().accounts({
             user,
             receiver: this.receiver,
@@ -382,6 +483,56 @@ export class Connectivity {
         const sign = await this.wallet.sendTransaction(tx, this.connection);
         log("Trsansaction Sign: ", sign)
         return sign;
+    }
+
+    async sellNft(nft: web3.PublicKey | string, price: number) {
+        const seller = this.wallet.publicKey;
+        if (seller == null) throw "Wallet id not found"
+        if (typeof nft == "string") nft = new web3.PublicKey(nft)
+        const nftStateAccount = await this.__getOrInitNftStateAccount(nft);
+        const sellerAta = getAssociatedTokenAddressSync(nft, seller);
+        const mainStateAta = await this._getOrCreateTokenAccount(nft, this.mainStateAccount, true);
+        const nftMetadataAccount = this.__getMetadataAccount(nft);
+        price = Connectivity.calculateNonDecimalValue(price, 9)
+
+        const ix = await this.program.methods.sellNft(new BN(price)).accounts({
+            mainStateAccount: this.mainStateAccount,
+            mainStateAta,
+            nft,
+            nftMetadataAccount,
+            nftStateAccount,
+            seller,
+            sellerAta,
+            tokenProgram: TOKEN_PROGRAM_ID
+        }).instruction()
+        this.txis.push(ix)
+
+        await this._sendTransaction();
+    }
+
+    async buyNft(nft: web3.PublicKey | string, seller: web3.PublicKey | string) {
+        const buyer = this.wallet.publicKey;
+        if (seller == null) throw "Wallet id not found"
+        if (typeof nft == "string") nft = new web3.PublicKey(nft)
+        if (typeof seller == "string") seller = new web3.PublicKey(nft)
+        const nftStateAccount = await this.__getOrInitNftStateAccount(nft);
+        const buyerAta = getAssociatedTokenAddressSync(nft, buyer);
+        const mainStateAta = getAssociatedTokenAddressSync(nft, this.mainStateAccount, true);
+
+        const ix = await this.program.methods.buyNft().accounts({
+            buyer,
+            buyerAta,
+            seller,
+            nft,
+            nftStateAccount,
+            mainStateAccount: this.mainStateAccount,
+            mainStateAta,
+            systemProgram: web3.SystemProgram.programId,
+            tokenProgram: TOKEN_PROGRAM_ID
+        }).instruction()
+        this.txis.push(ix)
+
+        await this._sendTransaction();
     }
 
     //? Extra:
@@ -399,13 +550,13 @@ export class Connectivity {
             innerInstructionProgramId != web3.SystemProgram.programId.toBase58()
             || innerInstructionInfo?.destination != this.receiver.toBase58()
             || innerInstructionInfo?.source != payer.toBase58()
-            || innerInstructionInfo?.lamports != 1000_000
+            || innerInstructionInfo?.lamports != 1000_000 //* need to change with fetched onchain data.
             || innerInstructionType != "transfer"
         ) throw "Invalid Trasanction"
         else {
             log("Traansaction Verified !")
+            return true
         }
-
         // log({
         //     innerInstructionProgramId,
         //     innerInstructionInfo,
@@ -415,7 +566,7 @@ export class Connectivity {
 
     async transferReward(receiver: web3.PublicKey) {
         const remnToken = this.receiver //! temperary
-        const sender = this.receiver;
+        const sender = this.receiver; //! temperary
         const senderAta = getAssociatedTokenAddressSync(remnToken, sender)
         const receiverAta = getAssociatedTokenAddressSync(remnToken, receiver)
 
