@@ -1,5 +1,5 @@
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import {} from 'web3'
+import { web3 } from '@project-serum/anchor'
 import { ConnectionProvider, WalletProvider, useWallet } from '@solana/wallet-adapter-react';
 import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import {
