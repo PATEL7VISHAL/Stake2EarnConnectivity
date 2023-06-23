@@ -6,10 +6,10 @@ import {
 } from '@solana/spl-token';
 import { WalletContextState } from "@solana/wallet-adapter-react";
 
-import { Metaplex, token } from '@metaplex-foundation/js';
+import { Metaplex } from '@metaplex-foundation/js';
 import { PROGRAM_ID as MPL_ID } from '@metaplex-foundation/mpl-token-metadata';
 
-import { TOKEN_PROGRAM_ID, ASSOCIATED_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
+import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
 import axios from 'axios';
 import { IDL, Stake2earn } from './stake2earn';
 
@@ -340,6 +340,7 @@ export class Connectivity {
         return info
     }
 
+    //TODO: need to merge the dummy nft functionality.
     async __getOrInitNftStateAccount(nft: web3.PublicKey) {
         let nftStateAccount = this.__getNftStateAccount(nft);
         let info = await this.connection.getAccountInfo(nftStateAccount);
