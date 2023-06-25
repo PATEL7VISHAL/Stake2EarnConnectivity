@@ -67,7 +67,12 @@ export type Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "mint",
+          "name": "mainState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nft",
           "isMut": false,
           "isSigner": false
         },
@@ -77,44 +82,18 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initDummyNftState",
-      "accounts": [
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "dummyNft",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "stateAccountAta",
+          "name": "nftStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "mainNft",
+          "name": "nftMetadataAccount",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "mainNftMetadataAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dummyNftStateAccount",
-          "isMut": true,
           "isSigner": false
         },
         {
@@ -195,14 +174,6 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "dummyNftStateAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "CHECK"
-          ]
-        },
-        {
           "name": "nft",
           "isMut": false,
           "isSigner": false
@@ -228,7 +199,7 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "dummyStateAtaD",
+          "name": "nftStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
@@ -264,14 +235,6 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "dummyNftStateAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "CHECK"
-          ]
-        },
-        {
           "name": "nft",
           "isMut": false,
           "isSigner": false
@@ -297,12 +260,58 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "dummyStateAtaD",
+          "name": "nftStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
         {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "getReward",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userStateAccountAta",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftMetadataAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -328,6 +337,10 @@ export type Stake2earn = {
             "type": "publicKey"
           },
           {
+            "name": "wBtcTokenId",
+            "type": "publicKey"
+          },
+          {
             "name": "stakeNftCollectionId",
             "type": "publicKey"
           },
@@ -338,22 +351,14 @@ export type Stake2earn = {
           {
             "name": "currentStaked",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "dummyNftState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "publicKey"
           },
           {
-            "name": "mainNftId",
-            "type": "publicKey"
+            "name": "nftRewardPerWeek",
+            "type": "u64"
+          },
+          {
+            "name": "legendaryNftRewardPerWeek",
+            "type": "u64"
           }
         ]
       }
@@ -368,6 +373,10 @@ export type Stake2earn = {
         "fields": [
           {
             "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "dummyNftId",
             "type": "publicKey"
           },
           {
@@ -389,6 +398,14 @@ export type Stake2earn = {
           {
             "name": "stakeInTime",
             "type": "i64"
+          },
+          {
+            "name": "isLegendaryNft",
+            "type": "bool"
+          },
+          {
+            "name": "claimedWeek",
+            "type": "u64"
           }
         ]
       }
@@ -423,6 +440,14 @@ export type Stake2earn = {
           {
             "name": "stakeNftCollectionId",
             "type": "publicKey"
+          },
+          {
+            "name": "nftRewardPerWeek",
+            "type": "u64"
+          },
+          {
+            "name": "legendaryNftRewardPerWeek",
+            "type": "u64"
           }
         ]
       }
@@ -591,7 +616,12 @@ export const IDL: Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "mint",
+          "name": "mainState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nft",
           "isMut": false,
           "isSigner": false
         },
@@ -601,44 +631,18 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initDummyNftState",
-      "accounts": [
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "dummyNft",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "stateAccountAta",
+          "name": "nftStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "mainNft",
+          "name": "nftMetadataAccount",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "mainNftMetadataAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dummyNftStateAccount",
-          "isMut": true,
           "isSigner": false
         },
         {
@@ -719,14 +723,6 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "dummyNftStateAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "CHECK"
-          ]
-        },
-        {
           "name": "nft",
           "isMut": false,
           "isSigner": false
@@ -752,7 +748,7 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "dummyStateAtaD",
+          "name": "nftStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
@@ -788,14 +784,6 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "dummyNftStateAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "CHECK"
-          ]
-        },
-        {
           "name": "nft",
           "isMut": false,
           "isSigner": false
@@ -821,12 +809,58 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "dummyStateAtaD",
+          "name": "nftStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
         {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "getReward",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userStateAccountAta",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftMetadataAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -852,6 +886,10 @@ export const IDL: Stake2earn = {
             "type": "publicKey"
           },
           {
+            "name": "wBtcTokenId",
+            "type": "publicKey"
+          },
+          {
             "name": "stakeNftCollectionId",
             "type": "publicKey"
           },
@@ -862,22 +900,14 @@ export const IDL: Stake2earn = {
           {
             "name": "currentStaked",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "dummyNftState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "publicKey"
           },
           {
-            "name": "mainNftId",
-            "type": "publicKey"
+            "name": "nftRewardPerWeek",
+            "type": "u64"
+          },
+          {
+            "name": "legendaryNftRewardPerWeek",
+            "type": "u64"
           }
         ]
       }
@@ -892,6 +922,10 @@ export const IDL: Stake2earn = {
         "fields": [
           {
             "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "dummyNftId",
             "type": "publicKey"
           },
           {
@@ -913,6 +947,14 @@ export const IDL: Stake2earn = {
           {
             "name": "stakeInTime",
             "type": "i64"
+          },
+          {
+            "name": "isLegendaryNft",
+            "type": "bool"
+          },
+          {
+            "name": "claimedWeek",
+            "type": "u64"
           }
         ]
       }
@@ -947,6 +989,14 @@ export const IDL: Stake2earn = {
           {
             "name": "stakeNftCollectionId",
             "type": "publicKey"
+          },
+          {
+            "name": "nftRewardPerWeek",
+            "type": "u64"
+          },
+          {
+            "name": "legendaryNftRewardPerWeek",
+            "type": "u64"
           }
         ]
       }

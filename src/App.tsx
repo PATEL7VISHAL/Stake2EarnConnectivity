@@ -43,8 +43,9 @@ const Content = () => {
     const wallet = useWallet();
     const connectivity = new Connectivity(wallet);
     // const nft = new web3.PublicKey("5H6Tv8eDa6YrPF3Chsub36a65nF2fqRNAxQyxCC8QqCm")
-    const nft = new web3.PublicKey("D8HDemUwpZZgVhmcEF95kuYZEsDzXs2NJJERtLb11xox")
+    // const nft = new web3.PublicKey("D8HDemUwpZZgVhmcEF95kuYZEsDzXs2NJJERtLb11xox")
     // const nft = new web3.PublicKey("8FsThUQoJDXe7dG5EzmU3hDHTmttq81xt8TfYjRvwwRH")
+    const nft = new web3.PublicKey("DbSAbtcHYGbJzTwotUpdX7wt9TGnq3ob8Exg6NyqkYAs") //Legendary
 
     return <>
         <WalletMultiButton />
@@ -61,6 +62,12 @@ const Content = () => {
             Unstake
         </button>
 
+
+        <button onClick={async () => {
+            let res = await connectivity.getReward(nft);
+        }}>
+            Get Reward
+        </button>
     </>
 }
 
