@@ -59,6 +59,42 @@ export type Stake2earn = {
       ]
     },
     {
+      "name": "depositRewardToken",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "ownerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainAccountAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "initNftState",
       "accounts": [
         {
@@ -314,6 +350,21 @@ export type Stake2earn = {
           "name": "nftMetadataAccount",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "userRewardTokenAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccountRewardTokenAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -439,6 +490,10 @@ export type Stake2earn = {
           },
           {
             "name": "stakeNftCollectionId",
+            "type": "publicKey"
+          },
+          {
+            "name": "wBtcTokenId",
             "type": "publicKey"
           },
           {
@@ -608,6 +663,42 @@ export const IDL: Stake2earn = {
       ]
     },
     {
+      "name": "depositRewardToken",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "ownerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainAccountAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "initNftState",
       "accounts": [
         {
@@ -863,6 +954,21 @@ export const IDL: Stake2earn = {
           "name": "nftMetadataAccount",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "userRewardTokenAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccountRewardTokenAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -988,6 +1094,10 @@ export const IDL: Stake2earn = {
           },
           {
             "name": "stakeNftCollectionId",
+            "type": "publicKey"
+          },
+          {
+            "name": "wBtcTokenId",
             "type": "publicKey"
           },
           {

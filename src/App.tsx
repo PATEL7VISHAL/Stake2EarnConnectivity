@@ -45,7 +45,8 @@ const Content = () => {
     // const nft = new web3.PublicKey("5H6Tv8eDa6YrPF3Chsub36a65nF2fqRNAxQyxCC8QqCm")
     // const nft = new web3.PublicKey("D8HDemUwpZZgVhmcEF95kuYZEsDzXs2NJJERtLb11xox")
     // const nft = new web3.PublicKey("8FsThUQoJDXe7dG5EzmU3hDHTmttq81xt8TfYjRvwwRH")
-    const nft = new web3.PublicKey("DbSAbtcHYGbJzTwotUpdX7wt9TGnq3ob8Exg6NyqkYAs") //Legendary
+    const nft = new web3.PublicKey("9V34nnugri9fuwt5GU9Aa5JYJxKaiK3gpdesAh8eSekS")
+    // const nft = new web3.PublicKey("5HjiW7usiVM1fTKE9NYHC5dt3uNTsZhrBd5rm8pwBRop") //Legendary # 228
 
     return <>
         <WalletMultiButton />
@@ -68,6 +69,7 @@ const Content = () => {
         }}>
             Get Reward
         </button>
+
     </>
 }
 

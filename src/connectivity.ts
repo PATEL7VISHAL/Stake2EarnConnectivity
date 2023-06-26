@@ -1,4 +1,4 @@
-import { AnchorProvider, Program, web3 } from '@project-serum/anchor';
+import { AnchorProvider, BN, Program, web3 } from '@project-serum/anchor';
 import { base64, utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes';
 import {
     createAssociatedTokenAccountInstruction,
@@ -59,6 +59,8 @@ export class Connectivity {
     receiver: web3.PublicKey
     stakeNftCreator: web3.PublicKey
     extraSignature: web3.Keypair[] = []
+    wBtcTokenId: web3.PublicKey
+
 
     constructor(_wallet: WalletContextState) {
         this.wallet = _wallet;
@@ -74,6 +76,7 @@ export class Connectivity {
         this.mainStateAccount = web3.PublicKey.findProgramAddressSync([Seeds.SEED_MAIN_STATE], this.programId)[0];
         this.stakeNftCreator = new web3.PublicKey("5DCC58iQbP5Gab18C9UA9RuXJ8ccb7a1HRvEZ7tyw7Fv")
         this.owner = new web3.PublicKey("GPv247pHoMhA6MFdLmzXzA9JdmVgn6g1VvLUS8kn38Ej")
+        this.wBtcTokenId = new web3.PublicKey("uG6WCzPivRaLGps1pimZupyPCiFeJrvriPu74foLuPR")
     }
 
     static calculateNonDecimalValue(value: number, decimal: number) {
@@ -451,7 +454,7 @@ export class Connectivity {
             nftStateAccountAtaD,
             userAtaD,
         }).instruction()
-        // this.txis.push(ix);
+        this.txis.push(ix);
 
         await this._sendTransaction();
     }
@@ -496,6 +499,8 @@ export class Connectivity {
         const userStateAccount = this.__getUserStateAccount(user);
         const userStateAccountAta = getAssociatedTokenAddressSync(nft, userStateAccount, true);
         const [nftStateAccount, dummyNft] = await this.__getOrInitNftStateAccount(nft, false);
+        const mainStateAccountRewardTokenAta = getAssociatedTokenAddressSync(this.wBtcTokenId, this.mainStateAccount, true);
+        const userRewardTokenAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, user);
 
         const ix = await this.program.methods.getReward().accounts({
             mainStateAccount: this.mainStateAccount,
@@ -505,6 +510,9 @@ export class Connectivity {
             user,
             userStateAccount,
             userStateAccountAta,
+            mainStateAccountRewardTokenAta,
+            userRewardTokenAta,
+            tokenProgram: TOKEN_PROGRAM_ID,
         }).instruction();
 
         this.txis.push(ix);
@@ -512,4 +520,25 @@ export class Connectivity {
 
     }
 
+    // // NOTE: Only for Admins 
+    // async depositRewardToken() {
+    //     const owner = this.wallet.publicKey;
+    //     if (owner == null) throw "Wallet id not found"
+
+    //     const mainAccountAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, this.mainStateAccount, true);
+    //     const ownerAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, owner);
+
+    //     const amount = 1000 * 1000_000_000;
+    //     const ix = await this.program.methods.depositRewardToken(new BN(amount)).accounts({
+    //         mainAccount: this.mainStateAccount,
+    //         mainAccountAta,
+    //         owner,
+    //         ownerAta,
+    //         tokenProgram: TOKEN_PROGRAM_ID
+    //     }).instruction();
+
+    //     this.txis.push(ix);
+
+    //     await this._sendTransaction();
+    // }
 }
