@@ -1,4 +1,4 @@
-import { AnchorProvider, BN, Program, web3 } from '@project-serum/anchor';
+import { AnchorProvider, IdlAccounts, Program, web3 } from '@project-serum/anchor';
 import { base64, utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes';
 import {
     createAssociatedTokenAccountInstruction,
@@ -26,14 +26,23 @@ const Seeds = {
     SEED_NFT_STATE: utf8.encode("nft_state_"),
 }
 
+const NftStateTypeName = "nftState"
+type NftStateType = IdlAccounts<Stake2earn>[typeof NftStateTypeName];
+
 export interface NftState {
-    currentOwner: string,
-    isInstake: boolean,
-    stakeInTime: number | null,
-    releaseDate: Date | null,
-    minStakingDuration: number | null,
-    isInMarketplace: boolean,
-    price: number | null,
+    nft: string;
+    dummyNft: string;
+    currentOwner: string;
+    isStated: boolean;
+    stakeInTime: number;
+    claimableRewardAmount: number;
+    nftTypeName: string;
+    isRewardCalculated: boolean;
+    isFinalStakingTimeCalculated: boolean;
+    isClaimed: boolean;
+    isInstake: boolean;
+    stakedDays: number;
+    lastClaimedRound: number;
 }
 
 export interface NftInfo {
@@ -164,13 +173,31 @@ export class Connectivity {
 
         let state = {
             owner: res.owner.toBase58(),
-            receiver: res.receiver.toBase58(),
             w_btc_token_id: res.wBtcTokenId.toBase58(),
             stake_nft_collection_id: res.stakeNftCollectionId.toBase58(),
-            total_staked: res.totalStaked.toNumber(),
-            current_staked: res.currentStaked.toNumber(),
-            nft_reward_per_week: res.nftRewardPerWeek.toNumber() / 1000_000_00,
-            legendary_nft_reward_per_week: res.legendaryNftRewardPerWeek.toNumber() / 1000_000_00,
+            whiteNftsStakeInfo: {
+                totalCurrentStaked: res.whiteNftsStakeInfo.totalCurrentStaked.toNumber(),
+                rewardRate: res.whiteNftsStakeInfo.rewardRate.toNumber(),
+                totalStakingDays: res.whiteNftsStakeInfo.totalStakingDays.toNumber(),
+            },
+
+            diamondNftsStakeInfo: {
+                totalCurrentStaked: res.diamondNftsStakeInfo.totalCurrentStaked.toNumber(),
+                rewardRate: res.diamondNftsStakeInfo.rewardRate.toNumber(),
+                totalStakingDays: res.diamondNftsStakeInfo.totalStakingDays.toNumber(),
+            },
+
+            legendaryNftsStakeInfo: {
+                totalCurrentStaked: res.legendaryNftStakeInfo.totalCurrentStaked.toNumber(),
+                rewardRate: res.legendaryNftStakeInfo.rewardRate.toNumber(),
+                totalStakingDays: res.legendaryNftStakeInfo.totalStakingDays.toNumber(),
+
+            },
+            stakingRounds: res.stakingRounds.toNumber(),
+            startStakingTime: res.startStakingTime.toNumber(),
+            endStakingTime: res.endStakingTime.toNumber(),
+            overAllBtcAmount: res.overallBtcAmount.toNumber(),
+            overAllClaimedBtcAmount: res.overallClaimedBtcAmount.toNumber(),
         }
 
         return state;
@@ -209,33 +236,31 @@ export class Connectivity {
         ], this.programId)[0]
     }
 
-    static __parseNftStateRes(state: any): NftState | null {
+    static __parseNftStateRes(state: NftStateType): NftState | null {
         const stakeInTime = state.stakeInTime.toNumber();
-        const stakingType = state.stakingType
+        let nftType = "";
+        if (state.nftType.legendary) nftType = "legendary"
+        else if (state.nftType.diamond) nftType = "diamond"
+        else nftType = 'white'
 
-        let minStakingDuration = 0
-        if (stakingType.variant1 != null) minStakingDuration = 30
-        else if (stakingType.variant2 != null) minStakingDuration = 45
-        else if (stakingType.variant3 != null) minStakingDuration = 60
-        else { }
-
-        //?MIN Calculation (TESTING)
-        const releaseDate = new Date((stakeInTime + (minStakingDuration * 60)) * 1000)
-
-        //?DAYs Calculation (TESTING)
-        // const releaseDate = new Date((stakeInTime + (minStakingDuration * 60 * 60)) * 1000)
 
         const parseValue = {
+            nft: state.mint.toBase58(),
+            dummyNft: state.dummyNftId.toBase58(),
             currentOwner: state.currentOwner.toBase58(),
-            isInstake: state.isInStake,
+            isStated: state.isInStake,
             stakeInTime: state.isInStake ? stakeInTime : null,
-            stakingType: state.isInStake ? stakingType : null,
-            releaseDate: state.isInStake ? releaseDate : null,
-            minStakingDuration: state.isInStake ? minStakingDuration : null,
-            isInMarketplace: state.isInMarketplace,
-            price: state.isInMarketplace ? (state.price.toNumber() / 1000_000_000) : null,
+            claimableRewardAmount: state.claimableRewardAmount.toNumber(),
+            nftTypeName: nftType,
+            isRewardCalculated: state.isRewardCalculated,
+            isFinalStakingTimeCalculated: state.isFinalStakindTimeCalculated,
+            isClaimed: state.isClaimed,
+            isInstake: state.isInStake,
+            stakedDays: state.stakedDays.toNumber(),
+            lastClaimedRound: state.lastClaimedRound.toNumber(),
         }
-        return parseValue
+
+        return parseValue;
     }
 
     __getNftStateInfoFromBuffer(data: Buffer): NftState | null {
@@ -265,6 +290,9 @@ export class Connectivity {
 
         let verifiedStakedNft: NftInfo[] = [];
         let stateAccountsInfoReqData = [];
+
+        let res = this.connection.getMultipleAccountsInfo([]);
+        
         for (let i of nfts) {
             try {
                 const creator = i?.creators[0];
