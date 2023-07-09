@@ -1,4 +1,4 @@
-import { AnchorProvider, IdlAccounts, Program, web3 } from '@project-serum/anchor';
+import { AnchorProvider, BN, IdlAccounts, Program, web3 } from '@project-serum/anchor';
 import { base64, utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes';
 import {
     createAssociatedTokenAccountInstruction,
@@ -6,12 +6,13 @@ import {
 } from '@solana/spl-token';
 import { WalletContextState } from "@solana/wallet-adapter-react";
 
-import { Metaplex } from '@metaplex-foundation/js';
-import { PROGRAM_ID as MPL_ID } from '@metaplex-foundation/mpl-token-metadata';
+import { FindNftsByOwnerOutput, Metaplex, sendTokensBuilder } from '@metaplex-foundation/js';
+import { PROGRAM_ID as MPL_ID, Metadata } from '@metaplex-foundation/mpl-token-metadata';
 
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
 import axios from 'axios';
 import { IDL, Stake2earn } from './stake2earn';
+import { hrServerNftsIdStr } from './hrServerNfts';
 
 const log = console.log;
 const systemProgram = web3.SystemProgram.programId;
@@ -21,19 +22,21 @@ export enum TransactionType {
     MultiSign,
 }
 const Seeds = {
-    SEED_MAIN_STATE: utf8.encode("main_state_"),
-    SEED_USER_STATE: utf8.encode("user_state_"),
-    SEED_NFT_STATE: utf8.encode("nft_state_"),
+    SEED_MAIN_STATE: utf8.encode("main_state5"),
+    SEED_USER_STATE: utf8.encode("user_state5"),
+    SEED_NFT_STATE: utf8.encode("nft_state7"),
 }
 
 const NftStateTypeName = "nftState"
 type NftStateType = IdlAccounts<Stake2earn>[typeof NftStateTypeName];
 
+const PERCENTAGES_TOTAL = 1000_00;
+
 export interface NftState {
     nft: string;
     dummyNft: string;
     currentOwner: string;
-    isStated: boolean;
+    isStaked: boolean;
     stakeInTime: number;
     claimableRewardAmount: number;
     nftTypeName: string;
@@ -54,6 +57,12 @@ export interface NftInfo {
     image: string,
 }
 
+export interface CreateStakingRoundInput {
+    rewardAmount: number,
+    roundStartTime: number,
+    roundDurationInDays: number,
+}
+
 export class Connectivity {
     wallet: WalletContextState
     connection: web3.Connection;
@@ -69,7 +78,8 @@ export class Connectivity {
     stakeNftCreator: web3.PublicKey
     extraSignature: web3.Keypair[] = []
     wBtcTokenId: web3.PublicKey
-
+    collectionId: web3.PublicKey
+    nftCreator: web3.PublicKey
 
     constructor(_wallet: WalletContextState) {
         this.wallet = _wallet;
@@ -86,6 +96,8 @@ export class Connectivity {
         this.stakeNftCreator = new web3.PublicKey("5DCC58iQbP5Gab18C9UA9RuXJ8ccb7a1HRvEZ7tyw7Fv")
         this.owner = new web3.PublicKey("GPv247pHoMhA6MFdLmzXzA9JdmVgn6g1VvLUS8kn38Ej")
         this.wBtcTokenId = new web3.PublicKey("uG6WCzPivRaLGps1pimZupyPCiFeJrvriPu74foLuPR")
+        this.collectionId = new web3.PublicKey("4U9Gqk8Ntky7BHGtkfja9ycToKFS7KB1rBgG33UqeftF")
+        this.nftCreator = new web3.PublicKey("Ck1sj5K9ERW36ZnPJQ4d19SS4QCrkYJQprfZJzWD7Sen")
     }
 
     static calculateNonDecimalValue(value: number, decimal: number) {
@@ -177,19 +189,19 @@ export class Connectivity {
             stake_nft_collection_id: res.stakeNftCollectionId.toBase58(),
             whiteNftsStakeInfo: {
                 totalCurrentStaked: res.whiteNftsStakeInfo.totalCurrentStaked.toNumber(),
-                rewardRate: res.whiteNftsStakeInfo.rewardRate.toNumber(),
+                rewardRate: res.whiteNftsStakeInfo.rewardRate.toNumber() / PERCENTAGES_TOTAL,
                 totalStakingDays: res.whiteNftsStakeInfo.totalStakingDays.toNumber(),
             },
 
             diamondNftsStakeInfo: {
                 totalCurrentStaked: res.diamondNftsStakeInfo.totalCurrentStaked.toNumber(),
-                rewardRate: res.diamondNftsStakeInfo.rewardRate.toNumber(),
+                rewardRate: res.diamondNftsStakeInfo.rewardRate.toNumber() / PERCENTAGES_TOTAL,
                 totalStakingDays: res.diamondNftsStakeInfo.totalStakingDays.toNumber(),
             },
 
             legendaryNftsStakeInfo: {
                 totalCurrentStaked: res.legendaryNftStakeInfo.totalCurrentStaked.toNumber(),
-                rewardRate: res.legendaryNftStakeInfo.rewardRate.toNumber(),
+                rewardRate: res.legendaryNftStakeInfo.rewardRate.toNumber() / PERCENTAGES_TOTAL,
                 totalStakingDays: res.legendaryNftStakeInfo.totalStakingDays.toNumber(),
 
             },
@@ -236,20 +248,23 @@ export class Connectivity {
         ], this.programId)[0]
     }
 
-    static __parseNftStateRes(state: NftStateType): NftState | null {
+    __parseNftStateRes(state: NftStateType, verifyStateId = false, nftStateAccount: web3.PublicKey = null): NftState | null {
+        if (verifyStateId) {
+            const _nftStateAccountStr = this.__getNftStateAccount(state.mint).toBase58()
+            if (_nftStateAccountStr != nftStateAccount.toBase58()) return null;
+        }
         const stakeInTime = state.stakeInTime.toNumber();
         let nftType = "";
         if (state.nftType.legendary) nftType = "legendary"
         else if (state.nftType.diamond) nftType = "diamond"
         else nftType = 'white'
-
-
         const parseValue = {
             nft: state.mint.toBase58(),
             dummyNft: state.dummyNftId.toBase58(),
             currentOwner: state.currentOwner.toBase58(),
-            isStated: state.isInStake,
-            stakeInTime: state.isInStake ? stakeInTime : null,
+            isStaked: state.isInStake,
+            // stakeInTime: state.isInStake ? stakeInTime : null,
+            stakeInTime: stakeInTime,
             claimableRewardAmount: state.claimableRewardAmount.toNumber(),
             nftTypeName: nftType,
             isRewardCalculated: state.isRewardCalculated,
@@ -259,7 +274,6 @@ export class Connectivity {
             stakedDays: state.stakedDays.toNumber(),
             lastClaimedRound: state.lastClaimedRound.toNumber(),
         }
-
         return parseValue;
     }
 
@@ -267,7 +281,7 @@ export class Connectivity {
         try {
             const state = this.program.coder.accounts.decode("nftState", data)
 
-            const nftState = Connectivity.__parseNftStateRes(state);
+            const nftState = this.__parseNftStateRes(state);
             return nftState
         } catch { return null }
     }
@@ -278,9 +292,101 @@ export class Connectivity {
             const nftStateAccount = this.__getNftStateAccount(nft)
             const state = await this.program.account.nftState.fetch(nftStateAccount);
 
-            const nftState = Connectivity.__parseNftStateRes(state);
+            const nftState = this.__parseNftStateRes(state);
             return nftState
         } catch { return null }
+    }
+
+    async getFullProgramState(config: {
+        skipUserCheck: boolean
+    } = null) {
+        let userHRServerNfts: web3.PublicKey[] = []
+        let userStakedNft: web3.PublicKey[] = []
+
+        //NOTE: main net metadat test
+        // const metaplex= new Metaplex(new web3.Connection("https://solana-mainnet.g.alchemy.com/v2/wIrht2sL4LtKqalszbh4BmhWfmyAmjmm"))
+        // const info = await metaplex.nfts().findByMint({ mintAddress: new web3.PublicKey("BUNZfTtXxB96mjAmKEtFmhVEy7xJqSZs8LSUGaordv6K") })
+        // log("inof: ", info)
+
+
+        let handleAllUserNfts: Promise<FindNftsByOwnerOutput> = null;
+        if (!config?.skipUserCheck) handleAllUserNfts = this.metaplex.nfts().findAllByOwner({ owner: this.wallet.publicKey })
+
+        //TODO: need to match with real one data
+        const allCreatorNfts: any = await this.metaplex.nfts().findAllByCreator({ creator: this.nftCreator, position: 1 })
+        let HRServerNftsInfo: { nftId: string, nftInfo: any, stateAccountId: web3.PublicKey, stateInfo: NftState | null }[] = []
+        let HRServerNfts: Set<string> = new Set()
+        let hrServerNftsId: web3.PublicKey[] = []
+
+        for (let i of allCreatorNfts) {
+            const collectionInfo = i.collection
+            if (!collectionInfo) continue;
+
+            const collectionAddressStr = collectionInfo?.address.toBase58()
+            if (collectionAddressStr == this.collectionId.toBase58() && collectionInfo.verified) {
+                HRServerNftsInfo.push({ nftId: i.mintAddress.toBase58(), nftInfo: i, stateAccountId: null, stateInfo: null })
+                HRServerNfts.add(i.mintAddress.toBase58())
+            }
+        }
+
+
+        // hrServerNftsIdStr.map((e) => HRServerNfts.add(e))
+        // hrServerNftsIdStr.map((e) => hrServerNftsId.push(new web3.PublicKey(e)))
+        // const nftStateAccounts = hrServerNftsId.map((e) => this.__getNftStateAccount(e))
+        // const nftStateAccountsInfo = await this.connection.getMultipleAccountsInfo(nftStateAccounts);
+
+        // for (let i = 0; i < HRServerNftsInfo.length; ++i) {
+        //     let element: { nftId: string, nftInfo: any, stateAccountId: web3.PublicKey, stateInfo: NftState | null } = {
+        //         nftId: hrServerNftsIdStr[i],
+        //         nftInfo: null,
+        //         stateAccountId: nftStateAccounts[i],
+        //         stateInfo: null
+        //     };
+
+        //     try {
+        //         const state = this.program.coder.accounts.decode<NftStateType>(NftStateTypeName, nftStateAccountsInfo[i]?.data)
+        //         element.stateInfo = this.__parseNftStateRes(state);
+        //     } catch (e) { }
+
+        //     HRServerNftsInfo.push(element)
+        // }
+
+
+        const nftStateAccounts = HRServerNftsInfo.map((e) => this.__getNftStateAccount(e.nftInfo.mintAddress))
+        const nftStateAccountInfo = await this.connection.getMultipleAccountsInfo(nftStateAccounts);
+
+        //Get and Set NFt state
+        for (let i = 0; i < HRServerNftsInfo.length; ++i) {
+            HRServerNftsInfo[i].stateAccountId = nftStateAccounts[i]
+            const nftStateAccountData = nftStateAccountInfo[i]?.data
+            if (!nftStateAccountData) continue;
+
+            try {
+                const state = this.program.coder.accounts.decode<NftStateType>(NftStateTypeName, nftStateAccountData)
+                HRServerNftsInfo[i].stateInfo = this.__parseNftStateRes(state);
+            } catch (e) { }
+        }
+
+        //TODO: userStaked nft
+        if (!config?.skipUserCheck) {
+            const allUserNfts: any = await handleAllUserNfts;
+            for (let i of allUserNfts) {
+                if (HRServerNfts.has(i.mintAddress.toBase58())) userHRServerNfts.push(i.mintAddress)
+            }
+            //TODO: userStaked nft
+
+            return {
+                HRServerNftsInfo,
+                userHRServerNfts,
+                userStakedNft
+            }
+        } else {
+            return {
+                HRServerNftsInfo,
+                userHRServerNfts: null,
+                userStakedNft: null
+            }
+        }
     }
 
     async __getNftOwnedByAccount(owner: web3.PublicKey) {
@@ -292,7 +398,7 @@ export class Connectivity {
         let stateAccountsInfoReqData = [];
 
         let res = this.connection.getMultipleAccountsInfo([]);
-        
+
         for (let i of nfts) {
             try {
                 const creator = i?.creators[0];
@@ -409,7 +515,6 @@ export class Connectivity {
             this.extraSignature.push(tokenKp)
             return [nftStateAccount, dummyNft];
         }
-
     }
 
     async _getOrCreateTokenAccount(mint: web3.PublicKey, owner: web3.PublicKey, isOffCurve = false) {
@@ -549,24 +654,121 @@ export class Connectivity {
     }
 
     // // NOTE: Only for Admins 
-    // async depositRewardToken() {
-    //     const owner = this.wallet.publicKey;
-    //     if (owner == null) throw "Wallet id not found"
 
-    //     const mainAccountAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, this.mainStateAccount, true);
-    //     const ownerAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, owner);
+    async createStakingRound(input: CreateStakingRoundInput) {
+        const owner = this.wallet.publicKey;
+        if (!owner) throw "wallet not found"
+        const ownerAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, owner);
+        const mainStateAccountAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, this.mainStateAccount, true);
 
-    //     const amount = 1000 * 1000_000_000;
-    //     const ix = await this.program.methods.depositRewardToken(new BN(amount)).accounts({
-    //         mainAccount: this.mainStateAccount,
-    //         mainAccountAta,
-    //         owner,
-    //         ownerAta,
-    //         tokenProgram: TOKEN_PROGRAM_ID
-    //     }).instruction();
+        const ix = await this.program.methods.createStakingRound({
+            roundStartTime: new BN(input.roundStartTime),
+            roundDurationInDays: new BN(input.roundDurationInDays),
 
-    //     this.txis.push(ix);
+            //TODO: hardcoded decimals 
+            rewardAmount: new BN(Connectivity.calculateNonDecimalValue(input.rewardAmount, 9)),
+        }).accounts({
+            mainStateAccountAta,
+            mainStateAccount: this.mainStateAccount,
+            owner,
+            ownerAta,
+            tokenProgram: TOKEN_PROGRAM_ID,
+        }).instruction();
+        this.txis.push(ix)
 
-    //     await this._sendTransaction();
-    // }
+        await this._sendTransaction();
+    }
+
+    async calculateRewardAndDistribute() {
+        const owner = this.wallet.publicKey;
+        if (!owner) throw "wallet not found"
+
+        const HRServerNftsInfo = (await this.getFullProgramState({ skipUserCheck: true })).HRServerNftsInfo;
+        // log("HRServerNfts: ", HRServerNftsInfo)
+
+        let currentStakedNftStateAccounts: web3.PublicKey[] = []
+        let allStakedNftStateAccounts: web3.PublicKey[] = []
+
+        for (let i of HRServerNftsInfo) {
+            if (i.stateInfo) {
+                if (i.stateInfo.isStaked) {
+                    currentStakedNftStateAccounts.push(i.stateAccountId)
+                    allStakedNftStateAccounts.push(i.stateAccountId)
+                } else {
+                    if (i.stateInfo.stakedDays) allStakedNftStateAccounts.push(i.stateAccountId)
+                }
+            }
+        }
+
+        // Calculate the staking time from staked nfts
+        let ixs: web3.TransactionInstruction[] = [];
+        for (let nftStateAccount of currentStakedNftStateAccounts) {
+            const ix = await this.program.methods.calculateFinalStakingDays().accounts({
+                owner,
+                nftStateAccount,
+                mainStateAccount: this.mainStateAccount,
+            }).instruction()
+            ixs.push(ix)
+        }
+        log("ixs len: ", ixs.length)
+
+        // Calculate the reward amount and tranfer to the user
+        for (let nftStateAccount of allStakedNftStateAccounts) {
+            const ix = await this.program.methods.calculateStakingReward().accounts({
+                owner,
+                nftStateAccount,
+                mainStateAccount: this.mainStateAccount,
+            }).instruction()
+            ixs.push(ix)
+        }
+        log("ix len: ", ixs.length)
+        if (!ixs) throw 'Zero Instruction found'
+
+        let txs: web3.Transaction[] = []
+        let tx = new web3.Transaction();
+        tx.add(ixs[0])
+        for (let i = 1; i < ixs.length; ++i) {
+            if (i % 50 == 0) {
+                tx.feePayer = owner;
+                tx.recentBlockhash = (await this.connection.getLatestBlockhash()).blockhash;
+                txs.push(tx)
+                tx = new web3.Transaction();
+            }
+            tx.add(ixs[i])
+        }
+
+        if (tx.instructions.length != 0) {
+            tx.feePayer = owner;
+            tx.recentBlockhash = (await this.connection.getLatestBlockhash()).blockhash;
+            txs.push(tx)
+        }
+
+        let successResult = new Map<number, string>()
+        let failResult = new Map<number, string>()
+        const signedTxs = await this.wallet.signAllTransactions(txs)
+        for (let i = 0; i < signedTxs.length; ++i) {
+            const tx = signedTxs[i]
+            try {
+                const rawTx = tx.serialize();
+                const signature = await this.connection.sendRawTransaction(rawTx)
+                successResult.set(i, signature)
+            } catch (e) {
+                failResult.set(i, e.toString())
+            }
+        }
+
+        log("SuccessResult: ", successResult)
+        log("Fail Result: ", failResult)
+    }
+
+    async updateMainStateOwner() {
+        const newOwner = new web3.PublicKey("GPv247pHoMhA6MFdLmzXzA9JdmVgn6g1VvLUS8kn38Ej")
+        const ix = await this.program.methods.updateMainStateOwner(newOwner).accounts({
+            mainStateAccount: this.mainStateAccount,
+            owner: this.wallet.publicKey
+        }).instruction()
+        this.txis.push(ix)
+
+        await this._sendTransaction();
+    }
 }

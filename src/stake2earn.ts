@@ -42,11 +42,6 @@ export type Stake2earn = {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -69,11 +64,6 @@ export type Stake2earn = {
         {
           "name": "mainStateAccount",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
           "isSigner": false
         }
       ],
@@ -98,7 +88,7 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "mainAccountAta",
+          "name": "mainStateAccountAta",
           "isMut": true,
           "isSigner": false
         },
@@ -109,11 +99,6 @@ export type Stake2earn = {
         },
         {
           "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -144,11 +129,6 @@ export type Stake2earn = {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -169,11 +149,6 @@ export type Stake2earn = {
         {
           "name": "mainStateAccount",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
           "isSigner": false
         }
       ],
@@ -833,11 +808,6 @@ export const IDL: Stake2earn = {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -860,11 +830,6 @@ export const IDL: Stake2earn = {
         {
           "name": "mainStateAccount",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
           "isSigner": false
         }
       ],
@@ -889,7 +854,7 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "mainAccountAta",
+          "name": "mainStateAccountAta",
           "isMut": true,
           "isSigner": false
         },
@@ -900,11 +865,6 @@ export const IDL: Stake2earn = {
         },
         {
           "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -935,11 +895,6 @@ export const IDL: Stake2earn = {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -960,11 +915,6 @@ export const IDL: Stake2earn = {
         {
           "name": "mainStateAccount",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
           "isSigner": false
         }
       ],
