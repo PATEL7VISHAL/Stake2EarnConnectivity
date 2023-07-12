@@ -3,12 +3,33 @@ export type Stake2earn = {
   "name": "stake2earn",
   "instructions": [
     {
+      "name": "tempTest",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initMainState",
       "accounts": [
         {
           "name": "owner",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "mainStateAccount",
@@ -21,22 +42,20 @@ export type Stake2earn = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "MainStateInput"
-          }
-        }
-      ]
+      "args": []
     },
     {
-      "name": "updateMainState",
+      "name": "setMainState",
       "accounts": [
         {
           "name": "owner",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "mainStateAccount",
@@ -54,7 +73,7 @@ export type Stake2earn = {
       ]
     },
     {
-      "name": "updateMainStateOwner",
+      "name": "updateProgramStateOwner",
       "accounts": [
         {
           "name": "owner",
@@ -62,7 +81,7 @@ export type Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "mainStateAccount",
+          "name": "programState",
           "isMut": true,
           "isSigner": false
         }
@@ -88,7 +107,12 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "mainStateAccountAta",
+          "name": "programStateAccountAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programState",
           "isMut": true,
           "isSigner": false
         },
@@ -113,7 +137,7 @@ export type Stake2earn = {
       ]
     },
     {
-      "name": "calculateFinalStakingDays",
+      "name": "calculateAndDistributeReward",
       "accounts": [
         {
           "name": "owner",
@@ -121,28 +145,7 @@ export type Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "nftStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mainStateAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "calculateStakingReward",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "nftStateAccount",
+          "name": "programState",
           "isMut": true,
           "isSigner": false
         },
@@ -163,8 +166,13 @@ export type Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "mainState",
-          "isMut": false,
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programState",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -173,17 +181,12 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "nftStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "dummyNft",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "nftStateAccountAtaD",
+          "name": "programStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
@@ -226,27 +229,6 @@ export type Stake2earn = {
       "args": []
     },
     {
-      "name": "initUserState",
-      "accounts": [
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "stakeNft",
       "accounts": [
         {
@@ -255,17 +237,17 @@ export type Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "nftStateAccount",
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateAccountAta",
           "isMut": true,
           "isSigner": false
         },
@@ -285,17 +267,12 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "userStateAta",
+          "name": "userDummyNftAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userAtaD",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftStateAccountAtaD",
+          "name": "programStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
@@ -316,17 +293,17 @@ export type Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "nftStateAccount",
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateAccountAta",
           "isMut": true,
           "isSigner": false
         },
@@ -346,23 +323,13 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "userStateAta",
+          "name": "userDummyNftAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userAtaD",
+          "name": "programStateAccountAtaD",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftStateAccountAtaD",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
           "isSigner": false
         },
         {
@@ -387,22 +354,12 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userStateAccountAta",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "nftStateAccount",
+          "name": "programState",
           "isMut": true,
           "isSigner": false
         },
@@ -417,7 +374,12 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "mainStateAccountRewardTokenAta",
+          "name": "userDummyNftAta",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programStateAccountRewardTokenAta",
           "isMut": true,
           "isSigner": false
         },
@@ -432,10 +394,7 @@ export type Stake2earn = {
   ],
   "accounts": [
     {
-      "name": "mainState",
-      "docs": [
-        "Prefix: SEED_MAIN_STATE"
-      ],
+      "name": "programState",
       "type": {
         "kind": "struct",
         "fields": [
@@ -443,6 +402,18 @@ export type Stake2earn = {
             "name": "owner",
             "type": "publicKey"
           },
+          {
+            "name": "mainStateId",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "mainState",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "wBtcTokenId",
             "type": "publicKey"
@@ -478,7 +449,7 @@ export type Stake2earn = {
             "type": "i64"
           },
           {
-            "name": "stakingRounds",
+            "name": "currentStakingRound",
             "type": "u64"
           },
           {
@@ -492,83 +463,37 @@ export type Stake2earn = {
           {
             "name": "overallClaimedBtcAmount",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "nftState",
-      "docs": [
-        "SEEDS: SEED_NFT_STATE + MINT.key().as_ref()"
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "mint",
-            "type": "publicKey"
-          },
-          {
-            "name": "dummyNftId",
-            "type": "publicKey"
-          },
-          {
-            "name": "currentOwner",
-            "type": "publicKey"
-          },
-          {
-            "name": "isInStake",
-            "type": "bool"
-          },
-          {
-            "name": "stakeInTime",
-            "type": "i64"
-          },
-          {
-            "name": "nftType",
-            "type": {
-              "defined": "NftType"
-            }
-          },
-          {
-            "name": "claimableRewardAmount",
-            "type": "u64"
-          },
-          {
-            "name": "isClaimed",
-            "type": "bool"
           },
           {
             "name": "isRewardCalculated",
-            "type": "bool"
-          },
-          {
-            "name": "isFinalStakindTimeCalculated",
-            "type": "bool"
-          },
-          {
-            "name": "stakedDays",
-            "type": "i64"
-          },
-          {
-            "name": "lastClaimedRound",
             "type": "u64"
+          },
+          {
+            "name": "nftsState",
+            "type": {
+              "array": [
+                {
+                  "defined": "NftState"
+                },
+                256
+              ]
+            }
           }
         ]
       }
     },
     {
-      "name": "userState",
+      "name": "state",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "totalStaked",
-            "type": "u64"
-          },
-          {
-            "name": "currentStaked",
-            "type": "u64"
+            "name": "nftState",
+            "type": {
+              "vec": {
+                "defined": "NftState2"
+              }
+            }
           }
         ]
       }
@@ -585,15 +510,11 @@ export type Stake2earn = {
             "type": "u64"
           },
           {
-            "name": "totalPartialStaked",
-            "type": "u64"
-          },
-          {
             "name": "rewardRate",
             "type": "u64"
           },
           {
-            "name": "totalStakingDays",
+            "name": "totalStakingHours",
             "type": "i64"
           }
         ]
@@ -648,6 +569,94 @@ export type Stake2earn = {
       }
     },
     {
+      "name": "NftState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInit",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "dummyNftId",
+            "type": "publicKey"
+          },
+          {
+            "name": "nftType",
+            "type": "u64"
+          },
+          {
+            "name": "isInStake",
+            "type": "u64"
+          },
+          {
+            "name": "stakeInTime",
+            "type": "i64"
+          },
+          {
+            "name": "claimableRewardAmount",
+            "type": "u64"
+          },
+          {
+            "name": "isClaimed",
+            "type": "u64"
+          },
+          {
+            "name": "stakedHours",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NftState2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInit",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "dummyNftId",
+            "type": "publicKey"
+          },
+          {
+            "name": "nftType",
+            "type": "u64"
+          },
+          {
+            "name": "isInStake",
+            "type": "u64"
+          },
+          {
+            "name": "stakeInTime",
+            "type": "i64"
+          },
+          {
+            "name": "claimableRewardAmount",
+            "type": "u64"
+          },
+          {
+            "name": "isClaimed",
+            "type": "u64"
+          },
+          {
+            "name": "stakedHours",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
       "name": "NftType",
       "type": {
         "kind": "enum",
@@ -678,88 +687,123 @@ export type Stake2earn = {
     },
     {
       "code": 6002,
+      "name": "MissMatchMainStateId",
+      "msg": "Miss match MainState Id"
+    },
+    {
+      "code": 6003,
       "name": "NotStaked",
       "msg": "Nft haven't staked"
     },
     {
-      "code": 6003,
+      "code": 6004,
+      "name": "StateAlreadyInitialized",
+      "msg": "Nft State already initialized"
+    },
+    {
+      "code": 6005,
+      "name": "StateNotInitialized",
+      "msg": "Nft State not initialized"
+    },
+    {
+      "code": 6006,
+      "name": "StakingRoundNotFound",
+      "msg": "Newer Staking round not create"
+    },
+    {
+      "code": 6007,
       "name": "AlreadyStaked",
       "msg": "Nft Already Staked"
     },
     {
-      "code": 6004,
+      "code": 6008,
       "name": "StakingTimeNotCompleted",
       "msg": "Staking Time is not Completed"
     },
     {
-      "code": 6005,
+      "code": 6009,
       "name": "UnknownStakingType",
       "msg": "Unknown Staking Type"
     },
     {
-      "code": 6006,
+      "code": 6010,
       "name": "MetdataNotFound",
       "msg": "Metdata Not found !"
     },
     {
-      "code": 6007,
+      "code": 6011,
       "name": "UnknownNft",
       "msg": "Unknown Nft"
     },
     {
-      "code": 6008,
+      "code": 6012,
       "name": "UnAuthorized",
       "msg": "You don't have authority"
     },
     {
-      "code": 6009,
-      "name": "NftInMarketplace",
-      "msg": "Nft is in marketplace"
-    },
-    {
-      "code": 6010,
+      "code": 6013,
       "name": "NftInStaking",
       "msg": "Nft is in staking"
     },
     {
-      "code": 6011,
+      "code": 6014,
       "name": "MainNftIdMissMatch",
       "msg": "Main Nft id MissMatch"
     },
     {
-      "code": 6012,
+      "code": 6015,
+      "name": "DummyNftIdMissMatch",
+      "msg": "Main Nft id MissMatch"
+    },
+    {
+      "code": 6016,
       "name": "DummyNftRequire",
       "msg": "Dummy Nft is require to unstake nft"
     },
     {
-      "code": 6013,
+      "code": 6017,
       "name": "ZeroRewardAmount",
       "msg": "Reward Amount Zero found might be already claimed"
     },
     {
-      "code": 6014,
+      "code": 6018,
       "name": "StakingDaysAlreadyCalculated",
       "msg": "Staking days already calculated for this account"
     },
     {
-      "code": 6015,
+      "code": 6019,
       "name": "RewardAlreadyCalculated",
       "msg": "Reward alread Calculated"
     },
     {
-      "code": 6016,
+      "code": 6020,
       "name": "RewardAlreadyClaimed",
       "msg": "Reward Already claimed"
     },
     {
-      "code": 6017,
+      "code": 6021,
       "name": "FinalStakingTimeNotCalculated",
       "msg": "Final staking time not calculated"
     },
     {
-      "code": 6018,
+      "code": 6022,
       "name": "RewardNotCalculated",
       "msg": "Still the Reward not is not calculated by the admin"
+    },
+    {
+      "code": 6023,
+      "name": "StakingRoundNotCompleted",
+      "msg": "Staking Round Not Completed"
+    },
+    {
+      "code": 6024,
+      "name": "RewardCalculationModOn",
+      "msg": "Call Lock because of Reward CalCulation Running"
+    },
+    {
+      "code": 6025,
+      "name": "RewardCalculationModOff",
+      "msg": "Can Run Reward CalCulation if mode not active"
     }
   ]
 };
@@ -769,12 +813,33 @@ export const IDL: Stake2earn = {
   "name": "stake2earn",
   "instructions": [
     {
+      "name": "tempTest",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initMainState",
       "accounts": [
         {
           "name": "owner",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "mainStateAccount",
@@ -787,22 +852,20 @@ export const IDL: Stake2earn = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "MainStateInput"
-          }
-        }
-      ]
+      "args": []
     },
     {
-      "name": "updateMainState",
+      "name": "setMainState",
       "accounts": [
         {
           "name": "owner",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "mainStateAccount",
@@ -820,7 +883,7 @@ export const IDL: Stake2earn = {
       ]
     },
     {
-      "name": "updateMainStateOwner",
+      "name": "updateProgramStateOwner",
       "accounts": [
         {
           "name": "owner",
@@ -828,7 +891,7 @@ export const IDL: Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "mainStateAccount",
+          "name": "programState",
           "isMut": true,
           "isSigner": false
         }
@@ -854,7 +917,12 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "mainStateAccountAta",
+          "name": "programStateAccountAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programState",
           "isMut": true,
           "isSigner": false
         },
@@ -879,7 +947,7 @@ export const IDL: Stake2earn = {
       ]
     },
     {
-      "name": "calculateFinalStakingDays",
+      "name": "calculateAndDistributeReward",
       "accounts": [
         {
           "name": "owner",
@@ -887,28 +955,7 @@ export const IDL: Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "nftStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mainStateAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "calculateStakingReward",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "nftStateAccount",
+          "name": "programState",
           "isMut": true,
           "isSigner": false
         },
@@ -929,8 +976,13 @@ export const IDL: Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "mainState",
-          "isMut": false,
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programState",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -939,17 +991,12 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "nftStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "dummyNft",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "nftStateAccountAtaD",
+          "name": "programStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
@@ -992,27 +1039,6 @@ export const IDL: Stake2earn = {
       "args": []
     },
     {
-      "name": "initUserState",
-      "accounts": [
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "stakeNft",
       "accounts": [
         {
@@ -1021,17 +1047,17 @@ export const IDL: Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "nftStateAccount",
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateAccountAta",
           "isMut": true,
           "isSigner": false
         },
@@ -1051,17 +1077,12 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "userStateAta",
+          "name": "userDummyNftAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userAtaD",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftStateAccountAtaD",
+          "name": "programStateAccountAtaD",
           "isMut": true,
           "isSigner": false
         },
@@ -1082,17 +1103,17 @@ export const IDL: Stake2earn = {
           "isSigner": true
         },
         {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "nftStateAccount",
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateAccountAta",
           "isMut": true,
           "isSigner": false
         },
@@ -1112,23 +1133,13 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "userStateAta",
+          "name": "userDummyNftAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userAtaD",
+          "name": "programStateAccountAtaD",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftStateAccountAtaD",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
           "isSigner": false
         },
         {
@@ -1153,22 +1164,12 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "userStateAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userStateAccountAta",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "mainStateAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "nftStateAccount",
+          "name": "programState",
           "isMut": true,
           "isSigner": false
         },
@@ -1183,7 +1184,12 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "mainStateAccountRewardTokenAta",
+          "name": "userDummyNftAta",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "programStateAccountRewardTokenAta",
           "isMut": true,
           "isSigner": false
         },
@@ -1198,10 +1204,7 @@ export const IDL: Stake2earn = {
   ],
   "accounts": [
     {
-      "name": "mainState",
-      "docs": [
-        "Prefix: SEED_MAIN_STATE"
-      ],
+      "name": "programState",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1209,6 +1212,18 @@ export const IDL: Stake2earn = {
             "name": "owner",
             "type": "publicKey"
           },
+          {
+            "name": "mainStateId",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "mainState",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "wBtcTokenId",
             "type": "publicKey"
@@ -1244,7 +1259,7 @@ export const IDL: Stake2earn = {
             "type": "i64"
           },
           {
-            "name": "stakingRounds",
+            "name": "currentStakingRound",
             "type": "u64"
           },
           {
@@ -1258,83 +1273,37 @@ export const IDL: Stake2earn = {
           {
             "name": "overallClaimedBtcAmount",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "nftState",
-      "docs": [
-        "SEEDS: SEED_NFT_STATE + MINT.key().as_ref()"
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "mint",
-            "type": "publicKey"
-          },
-          {
-            "name": "dummyNftId",
-            "type": "publicKey"
-          },
-          {
-            "name": "currentOwner",
-            "type": "publicKey"
-          },
-          {
-            "name": "isInStake",
-            "type": "bool"
-          },
-          {
-            "name": "stakeInTime",
-            "type": "i64"
-          },
-          {
-            "name": "nftType",
-            "type": {
-              "defined": "NftType"
-            }
-          },
-          {
-            "name": "claimableRewardAmount",
-            "type": "u64"
-          },
-          {
-            "name": "isClaimed",
-            "type": "bool"
           },
           {
             "name": "isRewardCalculated",
-            "type": "bool"
-          },
-          {
-            "name": "isFinalStakindTimeCalculated",
-            "type": "bool"
-          },
-          {
-            "name": "stakedDays",
-            "type": "i64"
-          },
-          {
-            "name": "lastClaimedRound",
             "type": "u64"
+          },
+          {
+            "name": "nftsState",
+            "type": {
+              "array": [
+                {
+                  "defined": "NftState"
+                },
+                256
+              ]
+            }
           }
         ]
       }
     },
     {
-      "name": "userState",
+      "name": "state",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "totalStaked",
-            "type": "u64"
-          },
-          {
-            "name": "currentStaked",
-            "type": "u64"
+            "name": "nftState",
+            "type": {
+              "vec": {
+                "defined": "NftState2"
+              }
+            }
           }
         ]
       }
@@ -1351,15 +1320,11 @@ export const IDL: Stake2earn = {
             "type": "u64"
           },
           {
-            "name": "totalPartialStaked",
-            "type": "u64"
-          },
-          {
             "name": "rewardRate",
             "type": "u64"
           },
           {
-            "name": "totalStakingDays",
+            "name": "totalStakingHours",
             "type": "i64"
           }
         ]
@@ -1414,6 +1379,94 @@ export const IDL: Stake2earn = {
       }
     },
     {
+      "name": "NftState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInit",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "dummyNftId",
+            "type": "publicKey"
+          },
+          {
+            "name": "nftType",
+            "type": "u64"
+          },
+          {
+            "name": "isInStake",
+            "type": "u64"
+          },
+          {
+            "name": "stakeInTime",
+            "type": "i64"
+          },
+          {
+            "name": "claimableRewardAmount",
+            "type": "u64"
+          },
+          {
+            "name": "isClaimed",
+            "type": "u64"
+          },
+          {
+            "name": "stakedHours",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NftState2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInit",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "dummyNftId",
+            "type": "publicKey"
+          },
+          {
+            "name": "nftType",
+            "type": "u64"
+          },
+          {
+            "name": "isInStake",
+            "type": "u64"
+          },
+          {
+            "name": "stakeInTime",
+            "type": "i64"
+          },
+          {
+            "name": "claimableRewardAmount",
+            "type": "u64"
+          },
+          {
+            "name": "isClaimed",
+            "type": "u64"
+          },
+          {
+            "name": "stakedHours",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
       "name": "NftType",
       "type": {
         "kind": "enum",
@@ -1444,88 +1497,123 @@ export const IDL: Stake2earn = {
     },
     {
       "code": 6002,
+      "name": "MissMatchMainStateId",
+      "msg": "Miss match MainState Id"
+    },
+    {
+      "code": 6003,
       "name": "NotStaked",
       "msg": "Nft haven't staked"
     },
     {
-      "code": 6003,
+      "code": 6004,
+      "name": "StateAlreadyInitialized",
+      "msg": "Nft State already initialized"
+    },
+    {
+      "code": 6005,
+      "name": "StateNotInitialized",
+      "msg": "Nft State not initialized"
+    },
+    {
+      "code": 6006,
+      "name": "StakingRoundNotFound",
+      "msg": "Newer Staking round not create"
+    },
+    {
+      "code": 6007,
       "name": "AlreadyStaked",
       "msg": "Nft Already Staked"
     },
     {
-      "code": 6004,
+      "code": 6008,
       "name": "StakingTimeNotCompleted",
       "msg": "Staking Time is not Completed"
     },
     {
-      "code": 6005,
+      "code": 6009,
       "name": "UnknownStakingType",
       "msg": "Unknown Staking Type"
     },
     {
-      "code": 6006,
+      "code": 6010,
       "name": "MetdataNotFound",
       "msg": "Metdata Not found !"
     },
     {
-      "code": 6007,
+      "code": 6011,
       "name": "UnknownNft",
       "msg": "Unknown Nft"
     },
     {
-      "code": 6008,
+      "code": 6012,
       "name": "UnAuthorized",
       "msg": "You don't have authority"
     },
     {
-      "code": 6009,
-      "name": "NftInMarketplace",
-      "msg": "Nft is in marketplace"
-    },
-    {
-      "code": 6010,
+      "code": 6013,
       "name": "NftInStaking",
       "msg": "Nft is in staking"
     },
     {
-      "code": 6011,
+      "code": 6014,
       "name": "MainNftIdMissMatch",
       "msg": "Main Nft id MissMatch"
     },
     {
-      "code": 6012,
+      "code": 6015,
+      "name": "DummyNftIdMissMatch",
+      "msg": "Main Nft id MissMatch"
+    },
+    {
+      "code": 6016,
       "name": "DummyNftRequire",
       "msg": "Dummy Nft is require to unstake nft"
     },
     {
-      "code": 6013,
+      "code": 6017,
       "name": "ZeroRewardAmount",
       "msg": "Reward Amount Zero found might be already claimed"
     },
     {
-      "code": 6014,
+      "code": 6018,
       "name": "StakingDaysAlreadyCalculated",
       "msg": "Staking days already calculated for this account"
     },
     {
-      "code": 6015,
+      "code": 6019,
       "name": "RewardAlreadyCalculated",
       "msg": "Reward alread Calculated"
     },
     {
-      "code": 6016,
+      "code": 6020,
       "name": "RewardAlreadyClaimed",
       "msg": "Reward Already claimed"
     },
     {
-      "code": 6017,
+      "code": 6021,
       "name": "FinalStakingTimeNotCalculated",
       "msg": "Final staking time not calculated"
     },
     {
-      "code": 6018,
+      "code": 6022,
       "name": "RewardNotCalculated",
       "msg": "Still the Reward not is not calculated by the admin"
+    },
+    {
+      "code": 6023,
+      "name": "StakingRoundNotCompleted",
+      "msg": "Staking Round Not Completed"
+    },
+    {
+      "code": 6024,
+      "name": "RewardCalculationModOn",
+      "msg": "Call Lock because of Reward CalCulation Running"
+    },
+    {
+      "code": 6025,
+      "name": "RewardCalculationModOff",
+      "msg": "Can Run Reward CalCulation if mode not active"
     }
   ]
 };

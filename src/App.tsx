@@ -42,10 +42,10 @@ function App() {
 const Content = () => {
   const wallet = useWallet();
   const connectivity = new Connectivity(wallet);
-  // const nft = new web3.PublicKey("AsYSP3768d74eaF9uVFQ1DXNdm3xY5x7FJUmLH5nQD7B") // White
+  const nft = new web3.PublicKey("AsYSP3768d74eaF9uVFQ1DXNdm3xY5x7FJUmLH5nQD7B") // White
   // const nft = new web3.PublicKey("CjGDsVqhN1tPvkrosZ3pExAkQcM4XTBZK3no6xLcJA7V") // White
-  const nft = new web3.PublicKey("FuJfTTWEbapSxQ3Q847aNsCqNBGbqK38uRM8KAnmZe1y") // Diamond
-  // const nft = new web3.PublicKey("GMrM9Y2KvSzmiquxT7xdNt5rdDM2h6xA82m5xVTxGC5C") // Diamond
+  // const nft = new web3.PublicKey("FuJfTTWEbapSxQ3Q847aNsCqNBGbqK38uRM8KAnmZe1y") // Diamond
+  // const nft = new web3.PublicKey("GMrM9Y2KvSzmiquxT7xdNt5rdDM2h6xA82m5xVTxGC5C") // Diamond 
   // const nft = new web3.PublicKey("5oone1oqCBdPHvxsoEdTffiWWGf9GJHU4LFfSYSxQ24f") // Legendary
   // const nft = new web3.PublicKey("Ap9F4Z38hcmVuEvCAdfp3WxkPDRXm1N3N9BMsHmLNyVv") // Legendary
 
@@ -73,7 +73,7 @@ const Content = () => {
     <hr></hr>
 
     <button onClick={async () => {
-      const res = await connectivity.getFullProgramState();
+      const res = await connectivity.__getMainStateInfo()
       log("res: ", res)
 
     }}>Get Full State</button>
@@ -86,10 +86,10 @@ const Content = () => {
 
     <button onClick={async () => {
       const input: CreateStakingRoundInput = {
-        rewardAmount: 1,
+        rewardAmount: 0.1,
         //TODO Start time can be upcoming time and we can not it make sure the time in Seconds not in miliSeconds
         roundStartTime: Math.trunc(Date.now() / 1000),
-        roundDurationInDays: 10,
+        roundDurationInDays: 1,
       }
       await connectivity.createStakingRound(input);
     }}>Create Staking Round</button>
@@ -97,7 +97,10 @@ const Content = () => {
 
     <button onClick={async () => {
       await connectivity.calculateRewardAndDistribute();
-      // await connectivity.updateMainStateOwner();
+      // await connectivity.updateProgramStateOwner();
+
+      // const id = await connectivity.__getDummyNftId(nft);
+      // log("Dummy nftID: ",id.toBase58())
 
     }}>Calculate and Distribute the Reward</button>
 
