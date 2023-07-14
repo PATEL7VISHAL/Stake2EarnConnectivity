@@ -134,11 +134,12 @@ export class Connectivity {
       const signedTx = await this.wallet.signTransaction(tx);
       const res = await this.connection.sendRawTransaction(signedTx.serialize())
       log("Trasaction Sign: ", res);
-      alert("Trasaction Sussessful")
+      // alert("Trasaction Sussessful")
       return res;
     } catch (e) {
       log("Error: ", e);
-      alert("Trasaction Fail")
+      throw e;
+      // alert("Trasaction Fail")
     }
 
     finally {
