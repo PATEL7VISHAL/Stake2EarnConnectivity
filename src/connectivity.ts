@@ -272,9 +272,9 @@ export class Connectivity {
 
         try {
           const metadata = Metadata.fromAccountInfo(i)[0]
-          const name  =metadata?.data.name ;
-          const end  = metadata?.data.name.indexOf("\x00")
-          this.cacheNftInfos.set(metadata.mint.toBase58(), name.slice(0,end));
+          const name = metadata?.data.name;
+          const end = metadata?.data.name.indexOf("\x00")
+          this.cacheNftInfos.set(metadata.mint.toBase58(), name.slice(0, end));
         } catch { }
       }
     }
@@ -282,7 +282,7 @@ export class Connectivity {
     return {
       mainState: state,
       userHRServerNfts: userHRServerNfts,
-      userDummyNfts:userDummyNfts,
+      userDummyNfts: userDummyNfts,
       nftInfos: this.cacheNftInfos,
     }
   }
@@ -398,6 +398,20 @@ export class Connectivity {
       return null
     }
     return null
+  }
+
+  async _getNftName(token: web3.PublicKey | string): Promise<string> {
+    if (typeof token == 'string') token = new web3.PublicKey(token)
+    let res = this.cacheNftInfos.get(token.toBase58())
+    if (!res) {
+      // const info = (await this.metaplex.nfts().findByMint({mintAddress: token, loadJsonMetadata: false}).catch((e)=>null)).
+      const _name = (await this.metaplex.nfts().findByMint({ mintAddress: token, loadJsonMetadata: false })).name
+      if (_name) {
+        let end = _name.indexOf("\x00")
+        res = _name.slice(0, end)
+      }
+    }
+    return res;
   }
 
   async _getMetadata(token: web3.PublicKey, loadJsonMetadata: boolean = false) {
