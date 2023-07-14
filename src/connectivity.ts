@@ -227,36 +227,52 @@ export class Connectivity {
       overAllClaimedBtcAmount: res.overallClaimedBtcAmount.toNumber(),
       nftsState: parseNftsState,
       isRewardCalculated: res.isRewardCalculated.toNumber() == 1 ? true : false,
+      totalRewardableAmount: res.totalRewardableAmount.toNumber() / 1000_000_000
     }
 
-    //NOTE: getting use info:
+    //NOTE: getting user info:
     let userNfts = await this.metaplex.nfts().findAllByOwner({ owner: this.wallet.publicKey }).catch((_) => []);
     // let userHRServerNfts: web3.PublicKey[] = [];
     // let userDummyNfts: web3.PublicKey[] = [];
-    let userHRServerNfts: string[] = [];
-    let userDummyNfts: string[] = [];
+    let userHRServerNfts: Set<string> = new Set();
+    let userDummyNfts: Set<string> = new Set()
     let programHRServerNfts: Set<string> = new Set();
     let programDummyNfts: Set<string> = new Set();
+    let userClaimablAmountInfo = new Map<string, number>();
+    let userTotalClaimableAmount = 0;
 
     for (let i of state.nftsState) {
       if (!i.isInit) continue;
 
-      if (i.isStaked) programHRServerNfts.add(i.nft);
+      programHRServerNfts.add(i.nft);
       programDummyNfts.add(i.dummyNft);
+
     }
 
     for (let i of userNfts) {
       const mintAddress = i.mintAddress;
-      if (programHRServerNfts.has(mintAddress.toBase58())) userHRServerNfts.push(mintAddress.toBase58());
-      else if (programDummyNfts.has(mintAddress.toBase58())) userDummyNfts.push(mintAddress.toBase58());
+      if (programHRServerNfts.has(mintAddress.toBase58())) {
+        userHRServerNfts.add(mintAddress.toBase58());
+      }
+      else if (programDummyNfts.has(mintAddress.toBase58())) {
+        userDummyNfts.add(mintAddress.toBase58());
+      }
       else {
         const collectionId = i?.collection?.address
         if (collectionId) {
           const collectionIdStr = collectionId?.toBase58()
 
-          if (collectionIdStr == this.collectionId.toBase58()) userHRServerNfts.push(mintAddress.toBase58())
+          if (collectionIdStr == this.collectionId.toBase58()) userHRServerNfts.add(mintAddress.toBase58())
         }
       }
+    }
+
+    for (let i of state.nftsState) {
+      if (userHRServerNfts.has(i.nft) || userDummyNfts.has(i.dummyNft)) {
+        userClaimablAmountInfo.set(i.nft, i.claimableRewardAmount / 1000_000_000)
+        userTotalClaimableAmount += i.claimableRewardAmount / 1000_000_000
+      }
+
     }
 
     if (this.cacheNftInfos.size == 0) {
@@ -284,6 +300,9 @@ export class Connectivity {
       userHRServerNfts: userHRServerNfts,
       userDummyNfts: userDummyNfts,
       nftInfos: this.cacheNftInfos,
+      userTotalClaimableAmount,
+      userClaimablAmountInfo,
+      totalRewardableAmount: state.totalRewardableAmount,
     }
   }
 
@@ -409,6 +428,7 @@ export class Connectivity {
       if (_name) {
         let end = _name.indexOf("\x00")
         res = _name.slice(0, end)
+        this.cacheNftInfos.set(token.toBase58(), res)
       }
     }
     return res;

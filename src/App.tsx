@@ -42,12 +42,12 @@ function App() {
 const Content = () => {
   const wallet = useWallet();
   const connectivity = new Connectivity(wallet);
-  const nft = new web3.PublicKey("AsYSP3768d74eaF9uVFQ1DXNdm3xY5x7FJUmLH5nQD7B") // White
-  // const nft = new web3.PublicKey("CjGDsVqhN1tPvkrosZ3pExAkQcM4XTBZK3no6xLcJA7V") // White
+  // const nft = new web3.PublicKey("AsYSP3768d74eaF9uVFQ1DXNdm3xY5x7FJUmLH5nQD7B") // White
+  // const nft = new web3.PublicKey("CjGDsVqhN1tPvkrosZ3pExAkQcM4XTBZK3no6xLcJA7V") // Diamond
   // const nft = new web3.PublicKey("FuJfTTWEbapSxQ3Q847aNsCqNBGbqK38uRM8KAnmZe1y") // Diamond
-  // const nft = new web3.PublicKey("GMrM9Y2KvSzmiquxT7xdNt5rdDM2h6xA82m5xVTxGC5C") // Diamond 
+  // const nft = new web3.PublicKey("GMrM9Y2KvSzmiquxT7xdNt5rdDM2h6xA82m5xVTxGC5C") // White
   // const nft = new web3.PublicKey("5oone1oqCBdPHvxsoEdTffiWWGf9GJHU4LFfSYSxQ24f") // Legendary
-  // const nft = new web3.PublicKey("Ap9F4Z38hcmVuEvCAdfp3WxkPDRXm1N3N9BMsHmLNyVv") // Legendary
+  const nft = new web3.PublicKey("Ap9F4Z38hcmVuEvCAdfp3WxkPDRXm1N3N9BMsHmLNyVv") // Legendary
 
   return <>
     <WalletMultiButton />
