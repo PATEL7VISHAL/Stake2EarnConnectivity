@@ -29,6 +29,9 @@ const Content = () => {
     active: "",
   });
 
+  const [rewardAmount, setRewardAmount] = useState("");
+  const [roundDurationInDays, setRoundDurationInDays] = useState("");
+
   // const shortAddress = (address = "") => {
   //   return `${address.slice(0, 3)}..${address.slice(-3)}`;
   // };
@@ -46,6 +49,11 @@ const Content = () => {
       async (index) => {
         const _nft = _get(state, `mainState.nftsState.${index}`, {});
 
+        _NFTInfo[_nft.nft] = {
+          ..._NFTInfo[_nft.nft],
+          claimableRewardAmount: _nft.claimableRewardAmount,
+        };
+
         dummyNftMaps[_nft.dummyNft] = _nft.nft;
 
         if (_nft.isClaimed === true) {
@@ -59,7 +67,7 @@ const Content = () => {
     );
 
     _forEach(nftNames, function (row) {
-      _NFTInfo[row.nft] = row.name;
+      _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 
     setStats({
@@ -70,7 +78,9 @@ const Content = () => {
     setClaimedNFTs(_claimedNFTs);
     setNFTInfo(_NFTInfo);
 
-    setStakedNFTs(Array.from(state.userDummyNfts).map((dn) => dummyNftMaps[dn]));
+    setStakedNFTs(
+      Array.from(state.userDummyNfts).map((dn) => dummyNftMaps[dn])
+    );
     setUnStakedNFTs(Array.from(state.userHRServerNfts));
   };
 
@@ -209,7 +219,7 @@ const Content = () => {
                           />
                         )}
                       </div>
-                      <span>{NFTInfo[nft]}</span>
+                      <span>{NFTInfo[nft].name}</span>
                     </div>
                   ))}
                 </div>
@@ -266,7 +276,7 @@ const Content = () => {
                           />
                         )}
                       </div>
-                      <span>{NFTInfo[nft]}</span>
+                      <span>{NFTInfo[nft].name}</span>
                     </div>
                   ))}
                 </div>
@@ -296,11 +306,21 @@ const Content = () => {
               <div className="box1 mt-3 mb-3 box3">
                 <div className="box-summary">
                   <span>Total Rewardable</span>
-                  <span>{stats.totalRewardableAmount}</span>
+                  <span>{(stats.totalRewardableAmount).toFixed(4)}</span>
                 </div>
                 <div className="box-summary">
                   <span>Total Claimable Amount</span>
-                  <span>{stats.userTotalClaimableAmount}</span>
+                  <span>{(stats.userTotalClaimableAmount).toFixed(4)}</span>
+                </div>
+                <div className="box-summary">
+                  <span>Claimable Reward Amount</span>
+                  <span>
+                    {_get(
+                      NFTInfo,
+                      `${selectedNFT.selected}.claimableRewardAmount`,
+                      '-'
+                    )}
+                  </span>
                 </div>
               </div>
               <div>
@@ -335,58 +355,76 @@ const Content = () => {
         </div>
       </section>
 
-      <section>
-        <button
-          className="btn box-btn"
-          onClick={async () => {
-            try {
-              const res = await connectivity.__getMainStateInfo();
-              console.log("res: ", res);
-            } catch (error) {
-              console.log(error);
-            }
-          }}
-        >
-          Get Full State
-        </button>
+      <section className="row">
+        <div className="col-4">
+          <button
+            className="btn box-btn"
+            onClick={async () => {
+              try {
+                const res = await connectivity.__getMainStateInfo();
+                console.log("res: ", res);
+              } catch (error) {
+                console.log(error);
+              }
+            }}
+          >
+            Get Full State
+          </button>
+        </div>
 
-        <button
-          className="btn box-btn"
-          style={{ margin: "15px" }}
-          onClick={async () => {
-            try {
-              const input: CreateStakingRoundInput = {
-                rewardAmount: 0.1,
-                //TODO Start time can be upcoming time and we can not it make sure the time in Seconds not in miliSeconds
-                roundStartTime: Math.trunc(Date.now() / 1000),
-                roundDurationInDays: 15,
-              };
-              await connectivity.createStakingRound(input);
-            } catch (error) {
-              console.log(error);
-            }
-          }}
-        >
-          Create Staking Round
-        </button>
+        <div className="d-flex flex-column col-4">
+          <label>Enter Reward Amount</label>
+          <input
+            className="mb-2"
+            value={rewardAmount}
+            onChange={(e) => setRewardAmount(e.target.value)}
+          />
+          <label>Enter Round Duration In Days</label>
+          <input
+            value={roundDurationInDays}
+            onChange={(e) => setRoundDurationInDays(e.target.value)}
+          />
+          <button
+            className="btn box-btn"
+            style={{ margin: "15px" }}
+            onClick={async () => {
+              try {
+                const input: CreateStakingRoundInput = {
+                  rewardAmount: Number(rewardAmount),
+                  //TODO Start time can be upcoming time and we can not it make sure the time in Seconds not in miliSeconds
+                  roundStartTime: Math.trunc(Date.now() / 1000),
+                  roundDurationInDays: Number(roundDurationInDays),
+                };
+                console.log("input", input);
+                await connectivity.createStakingRound(input);
+              } catch (error) {
+                console.log(error);
+              }
+            }}
+          >
+            Create Staking Round
+          </button>
+        </div>
 
-        <button
-          className="btn box-btn"
-          style={{ margin: "15px" }}
-          onClick={async () => {
-            try {
-              await connectivity.calculateRewardAndDistribute();
-            } catch (error) {
-              console.log(error);
-            }
-            // await connectivity.updateProgramStateOwner();
+        <div className="col-4">
+          <button
+            className="btn box-btn"
+            style={{ margin: "15px" }}
+            onClick={async () => {
+              try {
+                await connectivity.calculateRewardAndDistribute();
+              } catch (error) {
+                console.log(error);
+              }
+              // await connectivity.updateProgramStateOwner();
 
-            // const id = await connectivity.__getDummyNftId(nft);
-            // log("Dummy nftID: ",id.toBase58())
-          }}
-        >
-          Calculate and Distribute the Reward
-        </button>
+              // const id = await connectivity.__getDummyNftId(nft);
+              // log("Dummy nftID: ",id.toBase58())
+            }}
+          >
+            Calculate and Distribute the Reward
+          </button>
+        </div>
       </section>
     </div>
   );
