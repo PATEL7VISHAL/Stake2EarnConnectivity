@@ -5,7 +5,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import _get from "lodash/get";
 import _forEach from "lodash/forEach";
 
-import { Connectivity } from "./connectivity";
+import { Connectivity, CreateStakingRoundInput } from "./connectivity";
 
 import "./Staking.css";
 
@@ -34,8 +34,7 @@ const Content = () => {
   // };
 
   const fetchNfts = async () => {
-    const _staked = [];
-    const _unStaked = [];
+    const dummyNftMaps = [];
     const _NFTInfo = {};
     const _claimedNFTs = [];
 
@@ -47,11 +46,7 @@ const Content = () => {
       async (index) => {
         const _nft = _get(state, `mainState.nftsState.${index}`, {});
 
-        if (_nft.isStaked === true) {
-          _staked.push(_nft.nft);
-        } else {
-          _unStaked.push(_nft.nft);
-        }
+        dummyNftMaps[_nft.dummyNft] = _nft.nft;
 
         if (_nft.isClaimed === true) {
           _claimedNFTs.push(_nft.nft);
@@ -66,14 +61,17 @@ const Content = () => {
     _forEach(nftNames, function (row) {
       _NFTInfo[row.nft] = row.name;
     });
+
     setStats({
       totalRewardableAmount: state.totalRewardableAmount,
       userTotalClaimableAmount: state.userTotalClaimableAmount,
     });
+    
     setClaimedNFTs(_claimedNFTs);
     setNFTInfo(_NFTInfo);
-    setStakedNFTs(_staked);
-    setUnStakedNFTs(_unStaked);
+
+    setStakedNFTs(Array.from(state.userDummyNfts).map((dn) => dummyNftMaps[dn]));
+    setUnStakedNFTs(Array.from(state.userHRServerNfts));
   };
 
   const stake = async () => {
@@ -335,6 +333,60 @@ const Content = () => {
             </div>
           </div>
         </div>
+      </section>
+
+      <section>
+        <button
+          className="btn box-btn"
+          onClick={async () => {
+            try {
+              const res = await connectivity.__getMainStateInfo();
+              console.log("res: ", res);
+            } catch (error) {
+              console.log(error);
+            }
+          }}
+        >
+          Get Full State
+        </button>
+
+        <button
+          className="btn box-btn"
+          style={{ margin: "15px" }}
+          onClick={async () => {
+            try {
+              const input: CreateStakingRoundInput = {
+                rewardAmount: 0.1,
+                //TODO Start time can be upcoming time and we can not it make sure the time in Seconds not in miliSeconds
+                roundStartTime: Math.trunc(Date.now() / 1000),
+                roundDurationInDays: 1,
+              };
+              await connectivity.createStakingRound(input);
+            } catch (error) {
+              console.log(error);
+            }
+          }}
+        >
+          Create Staking Round
+        </button>
+
+        <button
+          className="btn box-btn"
+          style={{ margin: "15px" }}
+          onClick={async () => {
+            try {
+              await connectivity.calculateRewardAndDistribute();
+            } catch (error) {
+              console.log(error);
+            }
+            // await connectivity.updateProgramStateOwner();
+
+            // const id = await connectivity.__getDummyNftId(nft);
+            // log("Dummy nftID: ",id.toBase58())
+          }}
+        >
+          Calculate and Distribute the Reward
+        </button>
       </section>
     </div>
   );
