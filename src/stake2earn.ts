@@ -379,6 +379,11 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
+          "name": "userMainNftAta",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "programStateAccountRewardTokenAta",
           "isMut": true,
           "isSigner": false
@@ -717,93 +722,103 @@ export type Stake2earn = {
     },
     {
       "code": 6008,
+      "name": "AlreadyUnStaked",
+      "msg": "Nft Already UnStaked"
+    },
+    {
+      "code": 6009,
       "name": "StakingTimeNotCompleted",
       "msg": "Staking Time is not Completed"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "UnknownStakingType",
       "msg": "Unknown Staking Type"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "MetdataNotFound",
       "msg": "Metdata Not found !"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "UnknownNft",
       "msg": "Unknown Nft"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "UnAuthorized",
       "msg": "You don't have authority"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "NftInStaking",
       "msg": "Nft is in staking"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "MainNftIdMissMatch",
       "msg": "Main Nft id MissMatch"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "DummyNftIdMissMatch",
       "msg": "Main Nft id MissMatch"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "DummyNftRequire",
       "msg": "Dummy Nft is require to unstake nft"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "ZeroRewardAmount",
       "msg": "Reward Amount Zero found might be already claimed"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "StakingDaysAlreadyCalculated",
       "msg": "Staking days already calculated for this account"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "RewardAlreadyCalculated",
       "msg": "Reward alread Calculated"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "RewardAlreadyClaimed",
       "msg": "Reward Already claimed"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "FinalStakingTimeNotCalculated",
       "msg": "Final staking time not calculated"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "RewardNotCalculated",
       "msg": "Still the Reward not is not calculated by the admin"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "StakingRoundNotCompleted",
       "msg": "Staking Round Not Completed"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "RewardCalculationModOn",
       "msg": "Call Lock because of Reward CalCulation Running"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "RewardCalculationModOff",
       "msg": "Can Run Reward CalCulation if mode not active"
+    },
+    {
+      "code": 6027,
+      "name": "NftVerificationFailed",
+      "msg": "Nft Verification failed"
     }
   ]
 };
@@ -1189,6 +1204,11 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
+          "name": "userMainNftAta",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "programStateAccountRewardTokenAta",
           "isMut": true,
           "isSigner": false
@@ -1527,93 +1547,103 @@ export const IDL: Stake2earn = {
     },
     {
       "code": 6008,
+      "name": "AlreadyUnStaked",
+      "msg": "Nft Already UnStaked"
+    },
+    {
+      "code": 6009,
       "name": "StakingTimeNotCompleted",
       "msg": "Staking Time is not Completed"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "UnknownStakingType",
       "msg": "Unknown Staking Type"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "MetdataNotFound",
       "msg": "Metdata Not found !"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "UnknownNft",
       "msg": "Unknown Nft"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "UnAuthorized",
       "msg": "You don't have authority"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "NftInStaking",
       "msg": "Nft is in staking"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "MainNftIdMissMatch",
       "msg": "Main Nft id MissMatch"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "DummyNftIdMissMatch",
       "msg": "Main Nft id MissMatch"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "DummyNftRequire",
       "msg": "Dummy Nft is require to unstake nft"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "ZeroRewardAmount",
       "msg": "Reward Amount Zero found might be already claimed"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "StakingDaysAlreadyCalculated",
       "msg": "Staking days already calculated for this account"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "RewardAlreadyCalculated",
       "msg": "Reward alread Calculated"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "RewardAlreadyClaimed",
       "msg": "Reward Already claimed"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "FinalStakingTimeNotCalculated",
       "msg": "Final staking time not calculated"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "RewardNotCalculated",
       "msg": "Still the Reward not is not calculated by the admin"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "StakingRoundNotCompleted",
       "msg": "Staking Round Not Completed"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "RewardCalculationModOn",
       "msg": "Call Lock because of Reward CalCulation Running"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "RewardCalculationModOff",
       "msg": "Can Run Reward CalCulation if mode not active"
+    },
+    {
+      "code": 6027,
+      "name": "NftVerificationFailed",
+      "msg": "Nft Verification failed"
     }
   ]
 };

@@ -511,7 +511,8 @@ export class Connectivity {
     const dummyNft = await this.__getDummyNftId(nft);
     const programStateAccountRewardTokenAta = getAssociatedTokenAddressSync(this.wBtcTokenId, this.programStateAccount, true);
     const userRewardTokenAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, user);
-    const userDummyNftAta = getAssociatedTokenAddressSync(dummyNft, user)
+    const userDummyNftAta = await this._getOrCreateTokenAccount(dummyNft, user)
+    const userMainNftAta = await this._getOrCreateTokenAccount(nft, user)
 
     const ix = await this.program.methods.getReward().accounts({
       programState: this.programStateAccount,
@@ -522,6 +523,7 @@ export class Connectivity {
       userDummyNftAta,
       programStateAccountRewardTokenAta,
       userRewardTokenAta,
+      userMainNftAta,
       tokenProgram: TOKEN_PROGRAM_ID,
     }).instruction();
 
