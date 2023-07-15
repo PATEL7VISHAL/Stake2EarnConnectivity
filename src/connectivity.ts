@@ -318,7 +318,7 @@ export class Connectivity {
       dummyNft: isInit ? state.dummyNftId.toBase58() : null,
       isStaked,
       stakeInTime: isStaked ? new Date(state.stakeInTime.toNumber() * 1000) : null,
-      claimableRewardAmount: state.claimableRewardAmount.toNumber(),
+      claimableRewardAmount: state.claimableRewardAmount.toNumber() / 1000_000_000,
       nftType: isInit ? state.nftType.toNumber() : null,
       nftTypeStr,
       isClaimed: state.isClaimed.toNumber() == 1 ? true : false,
