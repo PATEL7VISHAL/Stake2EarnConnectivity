@@ -359,7 +359,7 @@ const Content = () => {
                 rewardAmount: 0.1,
                 //TODO Start time can be upcoming time and we can not it make sure the time in Seconds not in miliSeconds
                 roundStartTime: Math.trunc(Date.now() / 1000),
-                roundDurationInDays: 1,
+                roundDurationInDays: 15,
               };
               await connectivity.createStakingRound(input);
             } catch (error) {
