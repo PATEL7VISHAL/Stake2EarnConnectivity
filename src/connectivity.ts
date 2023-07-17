@@ -232,7 +232,7 @@ export class Connectivity {
       overAllClaimedBtcAmount: res.overallClaimedBtcAmount.toNumber(),
       nftsState: parseNftsState,
       isRewardCalculated: res.isRewardCalculated.toNumber() == 1 ? true : false,
-      // totalRewardableAmount: res.totalRewardableAmount.toNumber() / 1000_000_000
+      totalRewardableAmount: res.totalRewardableAmount.toNumber() / 1000_000_000
     }
 
     //NOTE: getting user info:
@@ -307,7 +307,7 @@ export class Connectivity {
       nftInfos: this.cacheNftInfos,
       userTotalClaimableAmount,
       userClaimablAmountInfo,
-      // totalRewardableAmount: state.totalRewardableAmount,
+      totalRewardableAmount: state.totalRewardableAmount,
     }
   }
 
