@@ -58,9 +58,13 @@ export interface NftInfo {
 }
 
 export interface CreateStakingRoundInput {
-  rewardAmount: number,
+  // rewardAmount: number,
   roundStartTime: number,
   // roundDurationInDays: number,
+}
+
+export interface EndStakingRoundInput {
+  rewardAmount: number,
 }
 
 export interface HRServerNftInfoType {
@@ -228,7 +232,7 @@ export class Connectivity {
       overAllClaimedBtcAmount: res.overallClaimedBtcAmount.toNumber(),
       nftsState: parseNftsState,
       isRewardCalculated: res.isRewardCalculated.toNumber() == 1 ? true : false,
-      totalRewardableAmount: res.totalRewardableAmount.toNumber() / 1000_000_000
+      // totalRewardableAmount: res.totalRewardableAmount.toNumber() / 1000_000_000
     }
 
     //NOTE: getting user info:
@@ -537,20 +541,14 @@ export class Connectivity {
   async createStakingRound(input: CreateStakingRoundInput) {
     const owner = this.wallet.publicKey;
     if (!owner) throw "wallet not found"
-    const ownerAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, owner);
-    const programStateAccountAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, this.programStateAccount, true);
-
     const ix = await this.program.methods.createStakingRound({
       roundStartTime: new BN(input.roundStartTime),
       // roundDurationInDays: new BN(input.roundDurationInDays),
       //TODO: hardcoded decimals 
-      rewardAmount: new BN(Connectivity.calculateNonDecimalValue(input.rewardAmount, 9)),
     }).accounts({
       mainStateAccount: this.mainStateAccount,
       programState: this.programStateAccount,
-      programStateAccountAta,
       owner,
-      ownerAta,
       tokenProgram: TOKEN_PROGRAM_ID,
     }).instruction();
     this.txis.push(ix)
@@ -558,14 +556,20 @@ export class Connectivity {
     await this._sendTransaction();
   }
 
-  async endStakingRound() {
+  async endStakingRound(input: EndStakingRoundInput) {
     const owner = this.wallet.publicKey;
     if (!owner) throw "wallet not found"
+    const ownerAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, owner);
+    const programStateAccountAta = await this._getOrCreateTokenAccount(this.wBtcTokenId, this.programStateAccount, true);
+    const rewardAmount = new BN(Connectivity.calculateNonDecimalValue(input.rewardAmount, 9))
 
-    const ix = await this.program.methods.endStakingEnd().accounts({
+    const ix = await this.program.methods.endStakingEnd({ rewardAmount }).accounts({
       owner,
+      ownerAta,
       programState: this.programStateAccount,
+      programStateAccountAta,
       mainStateAccount: this.mainStateAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
     }).instruction();
     this.txis.push(ix)
     await this._sendTransaction();

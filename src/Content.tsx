@@ -373,12 +373,6 @@ const Content = () => {
         </div>
 
         <div className="d-flex flex-column col-4">
-          <label>Enter Reward Amount</label>
-          <input
-            className="mb-2"
-            value={rewardAmount}
-            onChange={(e) => setRewardAmount(e.target.value)}
-          />
           {/* <label>Enter Round Duration In Days</label> */}
           {/* <input */}
           {/*   value={roundDurationInDays} */}
@@ -390,7 +384,6 @@ const Content = () => {
             onClick={async () => {
               try {
                 const input: CreateStakingRoundInput = {
-                  rewardAmount: Number(rewardAmount),
                   //TODO Start time can be upcoming time and we can not it make sure the time in Seconds not in miliSeconds
                   roundStartTime: Math.trunc(Date.now() / 1000),
                   // roundDurationInDays: Number(roundDurationInDays),
@@ -407,12 +400,18 @@ const Content = () => {
         </div>
 
         <div className="col-4">
+          <label>Enter Reward Amount</label>
+          <input
+            className="mb-2"
+            value={rewardAmount}
+            onChange={(e) => setRewardAmount(e.target.value)}
+          />
           <button
             className="btn box-btn"
             style={{ margin: "15px" }}
             onClick={async () => {
               try {
-                await connectivity.endStakingRound();
+                await connectivity.endStakingRound({ rewardAmount: Number(rewardAmount) });
               } catch (error) {
                 console.log(error);
               }

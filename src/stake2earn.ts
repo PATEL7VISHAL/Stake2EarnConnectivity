@@ -102,6 +102,39 @@ export type Stake2earn = {
           "isSigner": true
         },
         {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "roundInfo",
+          "type": {
+            "defined": "StartStakingRoundInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "endStakingEnd",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "ownerAta",
           "isMut": true,
           "isSigner": false
@@ -129,33 +162,12 @@ export type Stake2earn = {
       ],
       "args": [
         {
-          "name": "roundInfo",
+          "name": "input",
           "type": {
-            "defined": "StakingRoundInput"
+            "defined": "EndStakingRoundInput"
           }
         }
       ]
-    },
-    {
-      "name": "endStakingEnd",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "programState",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mainStateAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "initNftState",
@@ -554,17 +566,25 @@ export type Stake2earn = {
       }
     },
     {
-      "name": "StakingRoundInput",
+      "name": "StartStakingRoundInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "roundStartTime",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EndStakingRoundInput",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "rewardAmount",
             "type": "u64"
-          },
-          {
-            "name": "roundStartTime",
-            "type": "i64"
           }
         ]
       }
@@ -923,6 +943,39 @@ export const IDL: Stake2earn = {
           "isSigner": true
         },
         {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "roundInfo",
+          "type": {
+            "defined": "StartStakingRoundInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "endStakingEnd",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "ownerAta",
           "isMut": true,
           "isSigner": false
@@ -950,33 +1003,12 @@ export const IDL: Stake2earn = {
       ],
       "args": [
         {
-          "name": "roundInfo",
+          "name": "input",
           "type": {
-            "defined": "StakingRoundInput"
+            "defined": "EndStakingRoundInput"
           }
         }
       ]
-    },
-    {
-      "name": "endStakingEnd",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "programState",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mainStateAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "initNftState",
@@ -1375,17 +1407,25 @@ export const IDL: Stake2earn = {
       }
     },
     {
-      "name": "StakingRoundInput",
+      "name": "StartStakingRoundInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "roundStartTime",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EndStakingRoundInput",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "rewardAmount",
             "type": "u64"
-          },
-          {
-            "name": "roundStartTime",
-            "type": "i64"
           }
         ]
       }
