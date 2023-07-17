@@ -307,7 +307,7 @@ export class Connectivity {
       nftInfos: this.cacheNftInfos,
       userTotalClaimableAmount,
       userClaimablAmountInfo,
-      totalRewardableAmount: state.totalRewardableAmount,
+      // totalRewardableAmount: state.totalRewardableAmount,
     }
   }
 
