@@ -379,11 +379,11 @@ const Content = () => {
             value={rewardAmount}
             onChange={(e) => setRewardAmount(e.target.value)}
           />
-          <label>Enter Round Duration In Days</label>
-          <input
-            value={roundDurationInDays}
-            onChange={(e) => setRoundDurationInDays(e.target.value)}
-          />
+          {/* <label>Enter Round Duration In Days</label> */}
+          {/* <input */}
+          {/*   value={roundDurationInDays} */}
+          {/*   onChange={(e) => setRoundDurationInDays(e.target.value)} */}
+          {/* /> */}
           <button
             className="btn box-btn"
             style={{ margin: "15px" }}

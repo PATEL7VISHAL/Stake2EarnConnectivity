@@ -223,7 +223,7 @@ export class Connectivity {
       // startStakingTime: res.startStakingTime.toNumber(),
       // endStakingTime: res.endStakingTime.toNumber(),
       startStakingTime: start_staking_time == 0 ? null : new Date(start_staking_time * 1000),
-      endStakingTime: end_staking_time == 0 ? null : new Date(end_staking_time * 1000),
+      // endStakingTime: end_staking_time == 0 ? null : new Date(end_staking_time * 1000),
       overAllBtcAmount: res.overallBtcAmount.toNumber(),
       overAllClaimedBtcAmount: res.overallClaimedBtcAmount.toNumber(),
       nftsState: parseNftsState,
