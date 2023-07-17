@@ -60,7 +60,7 @@ export interface NftInfo {
 export interface CreateStakingRoundInput {
   rewardAmount: number,
   roundStartTime: number,
-  roundDurationInDays: number,
+  // roundDurationInDays: number,
 }
 
 export interface HRServerNftInfoType {
@@ -542,7 +542,7 @@ export class Connectivity {
 
     const ix = await this.program.methods.createStakingRound({
       roundStartTime: new BN(input.roundStartTime),
-      roundDurationInDays: new BN(input.roundDurationInDays),
+      // roundDurationInDays: new BN(input.roundDurationInDays),
       //TODO: hardcoded decimals 
       rewardAmount: new BN(Connectivity.calculateNonDecimalValue(input.rewardAmount, 9)),
     }).accounts({
@@ -558,11 +558,11 @@ export class Connectivity {
     await this._sendTransaction();
   }
 
-  async calculateRewardAndDistribute() {
+  async endStakingRound() {
     const owner = this.wallet.publicKey;
     if (!owner) throw "wallet not found"
 
-    const ix = await this.program.methods.calculateAndDistributeReward().accounts({
+    const ix = await this.program.methods.endStakingEnd().accounts({
       owner,
       programState: this.programStateAccount,
       mainStateAccount: this.mainStateAccount,

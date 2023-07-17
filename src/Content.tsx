@@ -66,7 +66,7 @@ const Content = () => {
       ([nft, name]) => ({ nft, name })
     );
 
-    _forEach(nftNames, function (row) {
+    _forEach(nftNames, function(row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 
@@ -74,7 +74,7 @@ const Content = () => {
       totalRewardableAmount: state.totalRewardableAmount,
       userTotalClaimableAmount: state.userTotalClaimableAmount,
     });
-    
+
     setClaimedNFTs(_claimedNFTs);
     setNFTInfo(_NFTInfo);
 
@@ -393,7 +393,7 @@ const Content = () => {
                   rewardAmount: Number(rewardAmount),
                   //TODO Start time can be upcoming time and we can not it make sure the time in Seconds not in miliSeconds
                   roundStartTime: Math.trunc(Date.now() / 1000),
-                  roundDurationInDays: Number(roundDurationInDays),
+                  // roundDurationInDays: Number(roundDurationInDays),
                 };
                 console.log("input", input);
                 await connectivity.createStakingRound(input);
@@ -412,7 +412,7 @@ const Content = () => {
             style={{ margin: "15px" }}
             onClick={async () => {
               try {
-                await connectivity.calculateRewardAndDistribute();
+                await connectivity.endStakingRound();
               } catch (error) {
                 console.log(error);
               }
@@ -422,7 +422,7 @@ const Content = () => {
               // log("Dummy nftID: ",id.toBase58())
             }}
           >
-            Calculate and Distribute the Reward
+            End Staking Round
           </button>
         </div>
       </section>

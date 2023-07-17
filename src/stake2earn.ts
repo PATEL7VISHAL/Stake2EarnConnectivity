@@ -137,7 +137,7 @@ export type Stake2earn = {
       ]
     },
     {
-      "name": "calculateAndDistributeReward",
+      "name": "endStakingEnd",
       "accounts": [
         {
           "name": "owner",
@@ -564,10 +564,6 @@ export type Stake2earn = {
           },
           {
             "name": "roundStartTime",
-            "type": "i64"
-          },
-          {
-            "name": "roundDurationInDays",
             "type": "i64"
           }
         ]
@@ -962,7 +958,7 @@ export const IDL: Stake2earn = {
       ]
     },
     {
-      "name": "calculateAndDistributeReward",
+      "name": "endStakingEnd",
       "accounts": [
         {
           "name": "owner",
@@ -1389,10 +1385,6 @@ export const IDL: Stake2earn = {
           },
           {
             "name": "roundStartTime",
-            "type": "i64"
-          },
-          {
-            "name": "roundDurationInDays",
             "type": "i64"
           }
         ]
