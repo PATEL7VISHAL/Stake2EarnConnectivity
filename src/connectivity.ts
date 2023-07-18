@@ -482,11 +482,11 @@ export class Connectivity {
     const user = this.wallet.publicKey;
     if (user == null) throw "Wallet id not found"
 
-    const userAta = getAssociatedTokenAddressSync(nft, user);
+    const userAta = await this._getOrCreateTokenAccount(nft, user);
     const nftMetadataAccount = this.__getMetadataAccount(nft)
     const dummyNft = await this.__getDummyNftId(nft);
     const userDummyNftAta = await this._getOrCreateTokenAccount(dummyNft, user)
-    const programStateAccountAta = await this._getOrCreateTokenAccount(nft, this.programStateAccount, true)
+    const programStateAccountAta = getAssociatedTokenAddressSync(nft, this.programStateAccount, true)
     const programStateAccountAtaD = getAssociatedTokenAddressSync(dummyNft, this.programStateAccount, true)
 
     const ix = await this.program.methods.unstakeNft().accounts({
