@@ -3,6 +3,97 @@ export type Stake2earn = {
   "name": "stake2earn",
   "instructions": [
     {
+      "name": "tranfer",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "sender",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "senderAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "senderTokenRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receiver",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receiverAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receiverTokenRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "edition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRulesProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRules",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mplProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "tempTest",
       "accounts": [
         {
@@ -274,6 +365,11 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
+          "name": "nftEditionAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAta",
           "isMut": true,
           "isSigner": false
@@ -290,6 +386,46 @@ export type Stake2earn = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "useTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRulesProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRules",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mplProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -330,6 +466,11 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
+          "name": "nftEditionAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAta",
           "isMut": true,
           "isSigner": false
@@ -346,6 +487,46 @@ export type Stake2earn = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "useTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRulesProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRules",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mplProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -844,6 +1025,97 @@ export const IDL: Stake2earn = {
   "name": "stake2earn",
   "instructions": [
     {
+      "name": "tranfer",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "sender",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "senderAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "senderTokenRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receiver",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receiverAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receiverTokenRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "edition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRulesProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRules",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mplProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "tempTest",
       "accounts": [
         {
@@ -1115,6 +1387,11 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
+          "name": "nftEditionAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAta",
           "isMut": true,
           "isSigner": false
@@ -1131,6 +1408,46 @@ export const IDL: Stake2earn = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "useTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRulesProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRules",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mplProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1171,6 +1488,11 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
+          "name": "nftEditionAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAta",
           "isMut": true,
           "isSigner": false
@@ -1187,6 +1509,46 @@ export const IDL: Stake2earn = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "useTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRulesProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRules",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mplProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
