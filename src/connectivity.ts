@@ -55,8 +55,12 @@ type MainStateType = IdlAccounts<Stake2earn>[typeof MainStateTypeName];
 type NftStateType = IdlTypes<Stake2earn>[typeof NftStateTypeName];
 
 const PERCENTAGES_TOTAL = 1000_00;
-const authorizationRules = new web3.PublicKey("eBJLFYPxJmMGKuFwpDWkzxZeUrad92kZRC5BJLpzyT9");
-const authorizationRulesProgram = new web3.PublicKey("auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg");
+const authorizationRules = new web3.PublicKey(
+  "eBJLFYPxJmMGKuFwpDWkzxZeUrad92kZRC5BJLpzyT9"
+);
+const authorizationRulesProgram = new web3.PublicKey(
+  "auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg"
+);
 
 export interface NftState {
   isInit: boolean;
@@ -145,7 +149,7 @@ export class Connectivity {
       this.programId
     )[0];
     this.mainStateAccount = new web3.PublicKey(
-      "HEBphcEEo2PrHSdSAMxMYtSYU2j2Wm4U6iuwYB4c5nNf"
+      "Aq8qJ6EkCN7EwRpNtxNH6kyFFseeGUJw6wv6XT1w42nB"
     );
     this.stakeNftCreator = new web3.PublicKey(
       "5DCC58iQbP5Gab18C9UA9RuXJ8ccb7a1HRvEZ7tyw7Fv"
@@ -154,7 +158,7 @@ export class Connectivity {
       "uG6WCzPivRaLGps1pimZupyPCiFeJrvriPu74foLuPR"
     );
     this.collectionId = new web3.PublicKey(
-      "4U9Gqk8Ntky7BHGtkfja9ycToKFS7KB1rBgG33UqeftF"
+      "5fgoy9kP3dhPD8wD5wPqd8s9WYVt3adP7RsBZQNLsRBs"
     );
   }
 
@@ -583,7 +587,8 @@ export class Connectivity {
       this.programStateAccount,
       true
     );
-    const useTokenRecordAccount = this.__getTokenRecordAccount(nft, userAta);
+
+    const userTokenRecordAccount = this.__getTokenRecordAccount(nft, userAta);
     const programStateTokenRecordAccount = this.__getTokenRecordAccount(
       nft,
       programStateAccountAta
@@ -604,7 +609,7 @@ export class Connectivity {
         userDummyNftAta,
 
         //pNFT special
-        useTokenRecordAccount,
+        userTokenRecordAccount,
         programStateTokenRecordAccount,
         ataProgram: ASSOCIATED_PROGRAM_ID,
         mplProgram: MPL_ID,
@@ -616,14 +621,28 @@ export class Connectivity {
       })
       .instruction();
     this.txis.push(ix);
-
     await this._sendTransaction();
+
+    // try {
+    //   const tx = new web3.Transaction().add(...this.txis);
+    //   tx.feePayer = user;
+    //   const res = await this.connection.simulateTransaction(tx);
+    //   log({ res });
+    // } catch (err) {
+    //   log({ err });
+    // }
   }
 
   async unstake(nft: web3.PublicKey | string) {
     if (typeof nft == "string") nft = new web3.PublicKey(nft);
     const user = this.wallet.publicKey;
     if (user == null) throw "Wallet id not found";
+
+    // Increasing Computation Budget from 200K to 300K
+    const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
+      units: 300_000,
+    });
+    this.txis.push(cUIncreaseIx);
 
     const userAta = await this._getOrCreateTokenAccount(nft, user);
     const nftMetadataAccount = this.__getMetadataAccount(nft);
@@ -641,7 +660,7 @@ export class Connectivity {
       true
     );
 
-    const useTokenRecordAccount = this.__getTokenRecordAccount(nft, userAta);
+    const userTokenRecordAccount = this.__getTokenRecordAccount(nft, userAta);
     const programStateTokenRecordAccount = this.__getTokenRecordAccount(
       nft,
       programStateAccountAta
@@ -661,7 +680,7 @@ export class Connectivity {
         programStateAccountAtaD,
 
         //pNFT specific
-        useTokenRecordAccount,
+        userTokenRecordAccount,
         programStateTokenRecordAccount,
         ataProgram: ASSOCIATED_PROGRAM_ID,
         mplProgram: MPL_ID,
@@ -675,6 +694,15 @@ export class Connectivity {
 
     this.txis.push(ix);
     await this._sendTransaction();
+
+    // try {
+    //   const tx = new web3.Transaction().add(...this.txis);
+    //   tx.feePayer = user;
+    //   const res = await this.connection.simulateTransaction(tx);
+    //   log({ res });
+    // } catch (err) {
+    //   log({ err });
+    // }
   }
 
   async getReward(nft: web3.PublicKey | string) {

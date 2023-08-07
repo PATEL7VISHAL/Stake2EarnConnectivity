@@ -361,12 +361,12 @@ export type Stake2earn = {
         },
         {
           "name": "nftMetadataAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
           "name": "nftEditionAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -390,7 +390,7 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "useTokenRecordAccount",
+          "name": "userTokenRecordAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -447,7 +447,7 @@ export type Stake2earn = {
         },
         {
           "name": "programState",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -462,7 +462,7 @@ export type Stake2earn = {
         },
         {
           "name": "nftMetadataAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -491,7 +491,7 @@ export type Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "useTokenRecordAccount",
+          "name": "userTokenRecordAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1383,12 +1383,12 @@ export const IDL: Stake2earn = {
         },
         {
           "name": "nftMetadataAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
           "name": "nftEditionAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -1412,7 +1412,7 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "useTokenRecordAccount",
+          "name": "userTokenRecordAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1469,7 +1469,7 @@ export const IDL: Stake2earn = {
         },
         {
           "name": "programState",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1484,7 +1484,7 @@ export const IDL: Stake2earn = {
         },
         {
           "name": "nftMetadataAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -1513,7 +1513,7 @@ export const IDL: Stake2earn = {
           "isSigner": false
         },
         {
-          "name": "useTokenRecordAccount",
+          "name": "userTokenRecordAccount",
           "isMut": true,
           "isSigner": false
         },
