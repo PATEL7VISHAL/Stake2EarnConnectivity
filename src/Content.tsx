@@ -138,6 +138,20 @@ const Content = () => {
     }
   };
 
+  //Basically this function should take two nft address(oldNft and newNft)
+  const upgradeNft = async () => {
+    //this two nfts value get from state(__getMainStateInfo function) contains two field 
+    //1. programOwnedNewNfts:(map<number,{nftID: nftData}) 
+    //2. userOldNFts:(map<number,{nftID: nftData}) 
+    // I just peek same id number nfts(program has new , user has old)  
+
+    const oldNft = "CjGDsVqhN1tPvkrosZ3pExAkQcM4XTBZK3no6xLcJA7V" //# 2
+    const newNft = "5ifcYuDmeH3iNY4s36mJgjyboH8a636z4oLsXHX6ern2" //# 2
+    // const newNft = "GTjszoYmvkAF9o9ct7VrLMhS2Any9ezo4x5z7oBdsC99" // fake id
+
+    await connectivity.upgradeNft(oldNft, newNft);
+  }
+
   useEffect(() => {
     if (wallet.connected) {
       fetchNfts();
@@ -151,7 +165,9 @@ const Content = () => {
       <section className="header">
         <div className="container-fluid">
           <div className="row header-row">
-            <div className="col-sm-3 text-center"></div>
+            <div className="col-sm-3 text-center">
+              <button className="btn box-btn" onClick={async () => await upgradeNft()}>Upgrade NFT</button>
+            </div>
             <div className="col-sm-6 text-center">
               <img
                 className="logo-img"

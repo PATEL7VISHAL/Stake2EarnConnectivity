@@ -126,7 +126,7 @@ export class Connectivity {
   cacheHRNftsInfo: HRServerNftInfoType[] = [];
   cacheNftInfos: Map<string, string> = new Map();
   oldCollectionId: web3.PublicKey;
-  programOwnedOldNfts: Map<number, { nft: string; metadata: MetadataMJ }>;
+  programOwnedNewNfts: Map<number, { nft: string; metadata: MetadataMJ }>;
 
   constructor(_wallet: WalletContextState) {
     this.wallet = _wallet;
@@ -167,7 +167,7 @@ export class Connectivity {
     this.oldCollectionId = new web3.PublicKey(
       "4U9Gqk8Ntky7BHGtkfja9ycToKFS7KB1rBgG33UqeftF"
     );
-    this.programOwnedOldNfts = new Map();
+    this.programOwnedNewNfts = new Map();
   }
 
   static calculateNonDecimalValue(value: number, decimal: number) {
@@ -399,7 +399,7 @@ export class Connectivity {
     }
 
     //Finding programOwnedNfts specific oldNft upgrade
-    const programOldNfts = new Map<
+    const programOwnedNewNfts = new Map<
       number,
       { nft: string; metadata: MetadataMJ }
     >();
@@ -412,14 +412,14 @@ export class Connectivity {
       if (!collectionIdStr) continue;
 
       if (
-        collectionIdStr == this.oldCollectionId.toBase58() &&
+        collectionIdStr == this.collectionId.toBase58() &&
         i?.collection?.verified
       ) {
         const id = getIdFromName(i.name);
-        programOldNfts.set(id, { nft: i.mintAddress.toBase58(), metadata: i });
+        programOwnedNewNfts.set(id, { nft: i.mintAddress.toBase58(), metadata: i });
       }
     }
-    this.programOwnedOldNfts = this.programOwnedOldNfts;
+    this.programOwnedNewNfts = programOwnedNewNfts;
 
     return {
       mainState: state,
@@ -430,7 +430,7 @@ export class Connectivity {
       userClaimablAmountInfo,
       totalRewardableAmount: state.totalRewardableAmount,
       userOldNfts,
-      programOldNfts,
+      programOwnedNewNfts,
     };
   }
 
@@ -622,11 +622,17 @@ export class Connectivity {
     oldNft: string | web3.PublicKey,
     newNft: string | web3.PublicKey
   ) {
+    this.txis = []
     const user = this.wallet.publicKey;
     if (!user) throw "User not found";
     if (!oldNft || !newNft) throw "Invalid nft details";
     if (typeof oldNft == "string") oldNft = new web3.PublicKey(oldNft);
     if (typeof newNft == "string") newNft = new web3.PublicKey(newNft);
+
+    const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
+      units: 500_000,
+    });
+    this.txis.push(cUIncreaseIx);
 
     const userNewNftAta = await this._getOrCreateTokenAccount(newNft, user);
     const programStateNewNftAta = getAssociatedTokenAddressSync(
@@ -683,9 +689,20 @@ export class Connectivity {
     this.txis.push(ix);
 
     await this._sendTransaction();
+
+    // try {
+    //   const tx = new web3.Transaction().add(...this.txis);
+    //   this.txis = []
+    //   tx.feePayer = user;
+    //   const res = await this.connection.simulateTransaction(tx);
+    //   log({ res });
+    // } catch (err) {
+    //   log({ err });
+    // }
   }
 
   async stake(nft: web3.PublicKey | string) {
+    this.txis = []
     const user = this.wallet.publicKey;
     if (user == null) throw "Wallet id not found";
     if (typeof nft == "string") nft = new web3.PublicKey(nft);
@@ -753,6 +770,7 @@ export class Connectivity {
   }
 
   async unstake(nft: web3.PublicKey | string) {
+    this.txis = []
     if (typeof nft == "string") nft = new web3.PublicKey(nft);
     const user = this.wallet.publicKey;
     if (user == null) throw "Wallet id not found";
