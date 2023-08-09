@@ -261,6 +261,122 @@ export type Stake2earn = {
       ]
     },
     {
+      "name": "upgradeNft",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldNft",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userOldNftAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newNft",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userNewNftAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateNewNftAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldNftMetadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldNftEditionAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldNftCollectionMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newNftMetadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newNftEditionAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRulesProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRules",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mplProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initNftState",
       "accounts": [
         {
@@ -602,6 +718,10 @@ export type Stake2earn = {
           },
           {
             "name": "mainStateId",
+            "type": "publicKey"
+          },
+          {
+            "name": "oldNftCollectionId",
             "type": "publicKey"
           }
         ]
@@ -1016,6 +1136,16 @@ export type Stake2earn = {
       "code": 6027,
       "name": "NftVerificationFailed",
       "msg": "Nft Verification failed"
+    },
+    {
+      "code": 6028,
+      "name": "NftNotFound",
+      "msg": "new nft not found in program"
+    },
+    {
+      "code": 6029,
+      "name": "NftsIdMissMatch",
+      "msg": "Old and New nft id MissMatch"
     }
   ]
 };
@@ -1283,6 +1413,122 @@ export const IDL: Stake2earn = {
       ]
     },
     {
+      "name": "upgradeNft",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mainStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldNft",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userOldNftAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newNft",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userNewNftAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateNewNftAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldNftMetadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldNftEditionAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldNftCollectionMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newNftMetadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newNftEditionAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "programStateTokenRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRulesProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authorizationRules",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mplProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initNftState",
       "accounts": [
         {
@@ -1624,6 +1870,10 @@ export const IDL: Stake2earn = {
           },
           {
             "name": "mainStateId",
+            "type": "publicKey"
+          },
+          {
+            "name": "oldNftCollectionId",
             "type": "publicKey"
           }
         ]
@@ -2038,6 +2288,16 @@ export const IDL: Stake2earn = {
       "code": 6027,
       "name": "NftVerificationFailed",
       "msg": "Nft Verification failed"
+    },
+    {
+      "code": 6028,
+      "name": "NftNotFound",
+      "msg": "new nft not found in program"
+    },
+    {
+      "code": 6029,
+      "name": "NftsIdMissMatch",
+      "msg": "Old and New nft id MissMatch"
     }
   ]
 };

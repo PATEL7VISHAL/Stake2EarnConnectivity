@@ -18,6 +18,7 @@ import {
   Metaplex,
   sendTokensBuilder,
   toNftEditionFromReadApiAsset,
+  Metadata as MetadataMJ,
 } from "@metaplex-foundation/js";
 import {
   PROGRAM_ID as MPL_ID,
@@ -46,7 +47,8 @@ export enum TransactionType {
 }
 const Seeds = {
   // SEED_MAIN_STATE: utf8.encode("main_state8"),
-  SEED_PROGRAM_STATE: utf8.encode("program_state2"),
+  // SEED_PROGRAM_STATE: utf8.encode("program_state2"),
+  SEED_PROGRAM_STATE: utf8.encode("program_state3"),
 };
 
 const NftStateTypeName = "NftState";
@@ -123,6 +125,8 @@ export class Connectivity {
   nftCreator: web3.PublicKey;
   cacheHRNftsInfo: HRServerNftInfoType[] = [];
   cacheNftInfos: Map<string, string> = new Map();
+  oldCollectionId: web3.PublicKey;
+  programOwnedOldNfts: Map<number, { nft: string; metadata: MetadataMJ }>;
 
   constructor(_wallet: WalletContextState) {
     this.wallet = _wallet;
@@ -160,6 +164,10 @@ export class Connectivity {
     this.collectionId = new web3.PublicKey(
       "5fgoy9kP3dhPD8wD5wPqd8s9WYVt3adP7RsBZQNLsRBs"
     );
+    this.oldCollectionId = new web3.PublicKey(
+      "4U9Gqk8Ntky7BHGtkfja9ycToKFS7KB1rBgG33UqeftF"
+    );
+    this.programOwnedOldNfts = new Map();
   }
 
   static calculateNonDecimalValue(value: number, decimal: number) {
@@ -299,15 +307,29 @@ export class Connectivity {
     let userNfts = await this.metaplex
       .nfts()
       .findAllByOwner({ owner: this.wallet.publicKey })
-      .catch((_) => []);
+      .catch<FindNftsByOwnerOutput>((_) => []);
+
+    const _programOwnedNfts = this.metaplex
+      .nfts()
+      .findAllByOwner({ owner: this.programStateAccount })
+      .catch<FindNftsByOwnerOutput>((_) => []);
+
     // let userHRServerNfts: web3.PublicKey[] = [];
     // let userDummyNfts: web3.PublicKey[] = [];
     let userHRServerNfts: Set<string> = new Set();
     let userDummyNfts: Set<string> = new Set();
+    let userOldNfts: Map<number, { nft: string; metadata: MetadataMJ }> =
+      new Map();
     let programHRServerNfts: Set<string> = new Set();
     let programDummyNfts: Set<string> = new Set();
     let userClaimablAmountInfo = new Map<string, number>();
     let userTotalClaimableAmount = 0;
+
+    const getIdFromName = (name: string) => {
+      const start = name.indexOf("#") + 1;
+      const idStr = name.slice(start).trim();
+      return parseInt(idStr);
+    };
 
     for (let i of state.nftsState) {
       if (!i.isInit) continue;
@@ -317,6 +339,7 @@ export class Connectivity {
     }
 
     for (let i of userNfts) {
+      if (i.model != "metadata") continue;
       const mintAddress = i.mintAddress;
       if (programHRServerNfts.has(mintAddress.toBase58())) {
         userHRServerNfts.add(mintAddress.toBase58());
@@ -329,6 +352,10 @@ export class Connectivity {
 
           if (collectionIdStr == this.collectionId.toBase58())
             userHRServerNfts.add(mintAddress.toBase58());
+          else if (collectionIdStr == this.oldCollectionId.toBase58()) {
+            const id = getIdFromName(i.name);
+            userOldNfts.set(id, { nft: mintAddress.toBase58(), metadata: i });
+          }
         }
       }
     }
@@ -371,6 +398,29 @@ export class Connectivity {
       }
     }
 
+    //Finding programOwnedNfts specific oldNft upgrade
+    const programOldNfts = new Map<
+      number,
+      { nft: string; metadata: MetadataMJ }
+    >();
+    const programOwnedNfts = await _programOwnedNfts;
+
+    for (let i of programOwnedNfts) {
+      if (i.model != "metadata") continue;
+      const collectionIdStr = i.collection?.address?.toBase58();
+
+      if (!collectionIdStr) continue;
+
+      if (
+        collectionIdStr == this.oldCollectionId.toBase58() &&
+        i?.collection?.verified
+      ) {
+        const id = getIdFromName(i.name);
+        programOldNfts.set(id, { nft: i.mintAddress.toBase58(), metadata: i });
+      }
+    }
+    this.programOwnedOldNfts = this.programOwnedOldNfts;
+
     return {
       mainState: state,
       userHRServerNfts: userHRServerNfts,
@@ -379,6 +429,8 @@ export class Connectivity {
       userTotalClaimableAmount,
       userClaimablAmountInfo,
       totalRewardableAmount: state.totalRewardableAmount,
+      userOldNfts,
+      programOldNfts,
     };
   }
 
@@ -564,6 +616,73 @@ export class Connectivity {
       loadJsonMetadata,
     });
     return res;
+  }
+
+  async upgradeNft(
+    oldNft: string | web3.PublicKey,
+    newNft: string | web3.PublicKey
+  ) {
+    const user = this.wallet.publicKey;
+    if (!user) throw "User not found";
+    if (!oldNft || !newNft) throw "Invalid nft details";
+    if (typeof oldNft == "string") oldNft = new web3.PublicKey(oldNft);
+    if (typeof newNft == "string") newNft = new web3.PublicKey(newNft);
+
+    const userNewNftAta = await this._getOrCreateTokenAccount(newNft, user);
+    const programStateNewNftAta = getAssociatedTokenAddressSync(
+      newNft,
+      this.programStateAccount,
+      true
+    );
+
+    const userOldNftAta = getAssociatedTokenAddressSync(oldNft, user);
+    const newNftEditionAccount = this.__getMasterEditionAccount(newNft);
+    const oldNftEditionAccount = this.__getMasterEditionAccount(oldNft);
+    const newNftMetadataAccount = this.__getMetadataAccount(newNft);
+    const oldNftMetadataAccount = this.__getMetadataAccount(oldNft);
+    const oldNftCollectionMetadata = this.__getMetadataAccount(
+      this.oldCollectionId
+    );
+
+    const userTokenRecordAccount = this.__getTokenRecordAccount(
+      newNft,
+      userNewNftAta
+    );
+    const programStateTokenRecordAccount = this.__getTokenRecordAccount(
+      newNft,
+      programStateNewNftAta
+    );
+
+    const ix = await this.program.methods
+      .upgradeNft()
+      .accounts({
+        user,
+        newNft,
+        oldNft,
+        userNewNftAta,
+        userOldNftAta,
+        ataProgram: ASSOCIATED_PROGRAM_ID,
+        mplProgram: MPL_ID,
+        programState: this.programStateAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram,
+        mainStateAccount: this.mainStateAccount,
+        authorizationRules,
+        sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        newNftEditionAccount,
+        oldNftEditionAccount,
+        newNftMetadataAccount,
+        oldNftMetadataAccount,
+        programStateNewNftAta,
+        userTokenRecordAccount,
+        oldNftCollectionMetadata,
+        authorizationRulesProgram,
+        programStateTokenRecordAccount,
+      })
+      .instruction();
+    this.txis.push(ix);
+
+    await this._sendTransaction();
   }
 
   async stake(nft: web3.PublicKey | string) {
