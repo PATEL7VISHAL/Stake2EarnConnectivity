@@ -426,6 +426,32 @@ input.btn420 {
     margin-right: 8px;
 }
 
+
+#OldTokenList {
+    max-height: 300px !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#OldTokenList::-webkit-scrollbar {
+    width: 0.5em;
+}
+
+#OldTokenList::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 26px;
+}
+
+#OldTokenList::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+}
+
+#OldTokenList > .box {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
 #tokenListChild > .box {
     margin-left: 7px;
     margin-right: 5px;
