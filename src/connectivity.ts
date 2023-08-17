@@ -48,7 +48,7 @@ export enum TransactionType {
 const Seeds = {
   // SEED_MAIN_STATE: utf8.encode("main_state8"),
   // SEED_PROGRAM_STATE: utf8.encode("program_state2"),
-  SEED_PROGRAM_STATE: utf8.encode("program_state3"),
+  SEED_PROGRAM_STATE: utf8.encode("program_state4"),
 };
 
 const NftStateTypeName = "NftState";
@@ -117,8 +117,6 @@ export class Connectivity {
   mainStateAccount: web3.PublicKey;
   programStateAccount: web3.PublicKey;
   owner: web3.PublicKey;
-  receiver: web3.PublicKey;
-  stakeNftCreator: web3.PublicKey;
   extraSignature: web3.Keypair[] = [];
   wBtcTokenId: web3.PublicKey;
   collectionId: web3.PublicKey;
@@ -137,7 +135,7 @@ export class Connectivity {
 
     //? Program setup
     this.programId = new web3.PublicKey(
-      "6N2uJ2YQoNfedif7zVQEwTNaxW1yZFjSMKhGQDqiYXpb"
+      "DQPz7LX1PDoK51SS2KXjLrS4t3ewgpiDkSkoLNGLwZiA"
     );
     // this.programId = new web3.PublicKey("BK8ySfPmvvYvDYHNwzVeqfsxhpQ6PWCEtbpovcbaNhHH")
     const anchorProvider = new AnchorProvider(this.connection, this.wallet, {
@@ -145,27 +143,21 @@ export class Connectivity {
       preflightCommitment: "confirmed",
     });
     this.program = new Program(IDL, this.programId, anchorProvider);
-    this.receiver = new web3.PublicKey(
-      "GPv247pHoMhA6MFdLmzXzA9JdmVgn6g1VvLUS8kn38Ej"
-    );
     this.programStateAccount = web3.PublicKey.findProgramAddressSync(
       [Seeds.SEED_PROGRAM_STATE],
       this.programId
     )[0];
     this.mainStateAccount = new web3.PublicKey(
-      "Aq8qJ6EkCN7EwRpNtxNH6kyFFseeGUJw6wv6XT1w42nB"
-    );
-    this.stakeNftCreator = new web3.PublicKey(
-      "5DCC58iQbP5Gab18C9UA9RuXJ8ccb7a1HRvEZ7tyw7Fv"
+      "58PjB3iDHSTZBfh3R2qMw8NrAxDefYCABDTxXiHm686A"
     );
     this.wBtcTokenId = new web3.PublicKey(
       "uG6WCzPivRaLGps1pimZupyPCiFeJrvriPu74foLuPR"
     );
     this.collectionId = new web3.PublicKey(
-      "5fgoy9kP3dhPD8wD5wPqd8s9WYVt3adP7RsBZQNLsRBs"
+      "J7Wb3SzgHLzojmBchTzqgy7iRjxdbWyjRLrHVyA2Wyu4"
     );
     this.oldCollectionId = new web3.PublicKey(
-      "4U9Gqk8Ntky7BHGtkfja9ycToKFS7KB1rBgG33UqeftF"
+      "5tQGk7SQLjYXhMkJFpZvyTdgptsXpDZP4qt4knWhXRRZ"
     );
     this.programOwnedNewNfts = new Map();
   }
@@ -394,7 +386,7 @@ export class Connectivity {
           const name = metadata?.data.name;
           const end = metadata?.data.name.indexOf("\x00");
           this.cacheNftInfos.set(metadata.mint.toBase58(), name.slice(0, end));
-        } catch {}
+        } catch { }
       }
     }
 
@@ -441,8 +433,8 @@ export class Connectivity {
       state.nftType.toNumber() == 2
         ? "legendary"
         : state.nftType.toNumber() == 1
-        ? "diamond"
-        : "white";
+          ? "diamond"
+          : "white";
 
     const parseValue: NftState = {
       isInit,

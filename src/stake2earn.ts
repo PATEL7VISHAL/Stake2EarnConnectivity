@@ -3,113 +3,6 @@ export type Stake2earn = {
   "name": "stake2earn",
   "instructions": [
     {
-      "name": "tranfer",
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "sender",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "senderAta",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "senderTokenRecord",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiver",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "receiverAta",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiverTokenRecord",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nft",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "edition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "sysvarInstructions",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ataProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authorizationRulesProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authorizationRules",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mplProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "tempTest",
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "initMainState",
       "accounts": [
         {
@@ -160,6 +53,10 @@ export type Stake2earn = {
           "type": {
             "defined": "MainStateInput"
           }
+        },
+        {
+          "name": "oldNftCollectionId",
+          "type": "publicKey"
         }
       ]
     },
@@ -799,22 +696,6 @@ export type Stake2earn = {
           }
         ]
       }
-    },
-    {
-      "name": "state",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nftState",
-            "type": {
-              "vec": {
-                "defined": "NftState2"
-              }
-            }
-          }
-        ]
-      }
     }
   ],
   "types": [
@@ -892,50 +773,6 @@ export type Stake2earn = {
     },
     {
       "name": "NftState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "isInit",
-            "type": "u64"
-          },
-          {
-            "name": "mint",
-            "type": "publicKey"
-          },
-          {
-            "name": "dummyNftId",
-            "type": "publicKey"
-          },
-          {
-            "name": "nftType",
-            "type": "u64"
-          },
-          {
-            "name": "isInStake",
-            "type": "u64"
-          },
-          {
-            "name": "stakeInTime",
-            "type": "i64"
-          },
-          {
-            "name": "claimableRewardAmount",
-            "type": "u64"
-          },
-          {
-            "name": "isClaimed",
-            "type": "u64"
-          },
-          {
-            "name": "stakedHours",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "NftState2",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1155,113 +992,6 @@ export const IDL: Stake2earn = {
   "name": "stake2earn",
   "instructions": [
     {
-      "name": "tranfer",
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "sender",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "senderAta",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "senderTokenRecord",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiver",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "receiverAta",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiverTokenRecord",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nft",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "edition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "sysvarInstructions",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ataProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authorizationRulesProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authorizationRules",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mplProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "tempTest",
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "initMainState",
       "accounts": [
         {
@@ -1312,6 +1042,10 @@ export const IDL: Stake2earn = {
           "type": {
             "defined": "MainStateInput"
           }
+        },
+        {
+          "name": "oldNftCollectionId",
+          "type": "publicKey"
         }
       ]
     },
@@ -1951,22 +1685,6 @@ export const IDL: Stake2earn = {
           }
         ]
       }
-    },
-    {
-      "name": "state",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nftState",
-            "type": {
-              "vec": {
-                "defined": "NftState2"
-              }
-            }
-          }
-        ]
-      }
     }
   ],
   "types": [
@@ -2044,50 +1762,6 @@ export const IDL: Stake2earn = {
     },
     {
       "name": "NftState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "isInit",
-            "type": "u64"
-          },
-          {
-            "name": "mint",
-            "type": "publicKey"
-          },
-          {
-            "name": "dummyNftId",
-            "type": "publicKey"
-          },
-          {
-            "name": "nftType",
-            "type": "u64"
-          },
-          {
-            "name": "isInStake",
-            "type": "u64"
-          },
-          {
-            "name": "stakeInTime",
-            "type": "i64"
-          },
-          {
-            "name": "claimableRewardAmount",
-            "type": "u64"
-          },
-          {
-            "name": "isClaimed",
-            "type": "u64"
-          },
-          {
-            "name": "stakedHours",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "NftState2",
       "type": {
         "kind": "struct",
         "fields": [
