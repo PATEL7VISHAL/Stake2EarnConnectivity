@@ -5,18 +5,18 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import _get from "lodash/get";
 import _forEach from "lodash/forEach";
 
-import { Connectivity, CreateStakingRoundInput } from "./connectivity";
+import { Connectivity } from "./connectivity";
 
 import "./Staking.css";
+import { Link } from "react-router-dom";
 
-const Content = () => {
+const Stake = () => {
   const wallet = useWallet();
   const connectivity = new Connectivity(wallet);
 
   const [txStatus, setTxStatus] = useState<string>("");
 
   const [stakedNFTs, setStakedNFTs] = useState([]);
-  const [oldNFTs, setOldNFTs] = useState({});
   const [unStakedNFTs, setUnStakedNFTs] = useState([]);
   const [claimedNFTs, setClaimedNFTs] = useState([]);
   const [NFTInfo, setNFTInfo] = useState({});
@@ -31,24 +31,9 @@ const Content = () => {
     nftId: -1,
   });
 
-  const [rewardAmount, setRewardAmount] = useState("");
-  // const [roundDurationInDays, setRoundDurationInDays] = useState("");
-
   // const shortAddress = (address = "") => {
   //   return `${address.slice(0, 3)}..${address.slice(-3)}`;
   // };
-
-  const setToObj = (set) => {
-    const outputObject = {};
-
-    for (const item of set) {
-      // Convert the item to a string for use as a key in the object
-      // const key = String(item);
-      outputObject[item[0]] = item[1];
-    }
-
-    return outputObject;
-  };
 
   const fetchNfts = async () => {
     const dummyNftMaps = [];
@@ -96,14 +81,6 @@ const Content = () => {
       Array.from(state.userDummyNfts).map((dn) => dummyNftMaps[dn])
     );
     setUnStakedNFTs(Array.from(state.userHRServerNfts));
-
-    const USNfts = {};
-    const OldNfts = setToObj(state.userOldNfts || new Set());
-    _forEach(OldNfts, (ON, KY) => {
-      USNfts[KY] = ON.nft;
-    });
-
-    setOldNFTs(USNfts);
   };
 
   const stake = async () => {
@@ -160,37 +137,6 @@ const Content = () => {
     }
   };
 
-  //Basically this function should take two nft address(oldNft and newNft)
-  const upgradeNft = async () => {
-    try {
-      const state = await connectivity.__getMainStateInfo();
-
-      const NewNfts = setToObj(state.programOwnedNewNfts || new Set());
-      const newNft = _get(NewNfts, selectedNFT.nftId, {})?.nft;
-      const oldNft = selectedNFT.selected;
-      
-      console.log("params", oldNft, newNft);
-      
-      if (oldNft && newNft) {
-        setTxStatus("Confirm Transaction on wallet.");
-
-        let hash = await connectivity.upgradeNft(oldNft, newNft);
-
-        setTxStatus(
-          `Processing upgrage, <a target="_blank" href="https://explorer.solana.com/tx/${hash}?cluster=devnet">Check here</a>`
-        );
-
-        setTimeout(() => {
-          setTxStatus("Upgrage Processed");
-        }, 2000);
-      } else {
-        setTxStatus("Something went wrong!");
-      }
-    } catch (error) {
-      setTxStatus(error?.message);
-    }
-  };
-
   useEffect(() => {
     if (wallet.connected) {
       fetchNfts();
@@ -205,12 +151,14 @@ const Content = () => {
         <div className="container-fluid">
           <div className="row header-row">
             <div className="col-sm-3 text-center">
-              <button
+            <Link className="text-white" to="/upgrade">Upgrade</Link>
+            <Link className="ms-2 text-white" to="/admin">Admin</Link>
+              {/* <button
                 className="btn box-btn"
                 onClick={async () => await upgradeNft()}
               >
                 Upgrade NFT
-              </button>
+              </button> */}
             </div>
             <div className="col-sm-6 text-center">
               <img
@@ -257,62 +205,7 @@ const Content = () => {
           </div>
 
           <div className="row text-white text-center">
-            <div className="col-3 mb-3">
-              <span className="text-center content-title-sub">
-                AVAILABLE TO UPGRADE
-              </span>
-              <div id="OldTokenList" className="row box1 mt-3 mb-3">
-                <div className="row">
-                  {Object.keys(oldNFTs).map((nftId) => {
-                    const nft = oldNFTs[nftId];
-
-                    return (
-                      <div
-                        key={nft}
-                        onClick={() => {
-                          setSelectedNFT({
-                            selected: nft,
-                            active: "old",
-                            nftId: Number(nftId),
-                          });
-                        }}
-                        className="col-4 text-center"
-                      >
-                        <div className="box1-small3 mb-2 green-check-btn">
-                          {selectedNFT.selected === nft && (
-                            <img
-                              className="green-check "
-                              src={require("./assets/check1.png")}
-                              alt="Header"
-                            />
-                          )}
-                        </div>
-                        <span>#{nftId}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div>
-                <p>
-                  Select the NFT you <br />
-                  would like to Upgrade
-                </p>
-
-                <button
-                  disabled={
-                    selectedNFT.selected === "" || selectedNFT.active !== "old"
-                  }
-                  className="btn box-btn me-2"
-                  id="stakeBtn"
-                  onClick={() => upgradeNft()}
-                >
-                  UPGRADE
-                </button>
-              </div>
-            </div>
-
-            <div className="col-3 mb-3">
+            <div className="col-4 mb-3">
               <span className="text-center content-title-sub">
                 AVAILABLE TO STAKE
               </span>
@@ -372,7 +265,7 @@ const Content = () => {
               </div>
             </div>
 
-            <div className="col-3 mb-3">
+            <div className="col-4 mb-3">
               <span className="text-center content-title-sub">STAKED NFT</span>
               <div id="stackedTokenList" className="row box1 mt-3 mb-3 pb-0">
                 <div className="row">
@@ -421,7 +314,7 @@ const Content = () => {
               </div>
             </div>
 
-            <div className="col-3 mb-3">
+            <div className="col-4 mb-3">
               <span className="text-center content-title-sub">
                 $TOKEN SUMMARY
               </span>
@@ -453,8 +346,8 @@ const Content = () => {
                 </p>
                 <button
                   disabled={
-                    (selectedNFT.selected === "" ||
-                    claimedNFTs.indexOf(selectedNFT.selected) > -1)
+                    selectedNFT.selected === "" ||
+                    claimedNFTs.indexOf(selectedNFT.selected) > -1
                   }
                   onClick={() => getReward()}
                   className="btn box-btn"
@@ -476,81 +369,8 @@ const Content = () => {
           </div>
         </div>
       </section>
-
-      <section className="row">
-        <div className="col-4">
-          <button
-            className="btn box-btn"
-            onClick={async () => {
-              try {
-                const res = await connectivity.__getMainStateInfo();
-                console.log("res: ", res);
-              } catch (error) {
-                console.log(error);
-              }
-            }}
-          >
-            Get Full State
-          </button>
-        </div>
-
-        <div className="d-flex flex-column col-4">
-          {/* <label>Enter Round Duration In Days</label> */}
-          {/* <input */}
-          {/*   value={roundDurationInDays} */}
-          {/*   onChange={(e) => setRoundDurationInDays(e.target.value)} */}
-          {/* /> */}
-          <button
-            className="btn box-btn"
-            style={{ margin: "15px" }}
-            onClick={async () => {
-              try {
-                const input: CreateStakingRoundInput = {
-                  //TODO Start time can be upcoming time and we can not it make sure the time in Seconds not in miliSeconds
-                  roundStartTime: Math.trunc(Date.now() / 1000),
-                  // roundDurationInDays: Number(roundDurationInDays),
-                };
-                console.log("input", input);
-                await connectivity.createStakingRound(input);
-              } catch (error) {
-                console.log(error);
-              }
-            }}
-          >
-            Create Staking Round
-          </button>
-        </div>
-
-        <div className="col-4">
-          <label>Enter Reward Amount</label>
-          <input
-            className="mb-2"
-            value={rewardAmount}
-            onChange={(e) => setRewardAmount(e.target.value)}
-          />
-          <button
-            className="btn box-btn"
-            style={{ margin: "15px" }}
-            onClick={async () => {
-              try {
-                await connectivity.endStakingRound({
-                  rewardAmount: Number(rewardAmount),
-                });
-              } catch (error) {
-                console.log(error);
-              }
-              // await connectivity.updateProgramStateOwner();
-
-              // const id = await connectivity.__getDummyNftId(nft);
-              // log("Dummy nftID: ",id.toBase58())
-            }}
-          >
-            End Staking Round
-          </button>
-        </div>
-      </section>
     </div>
   );
 };
 
-export default Content;
+export default Stake;

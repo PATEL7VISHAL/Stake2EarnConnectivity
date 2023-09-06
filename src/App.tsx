@@ -3,9 +3,7 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import {
-  WalletModalProvider,
-} from "@solana/wallet-adapter-react-ui";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
@@ -14,7 +12,11 @@ import {
 import { clusterApiUrl } from "@solana/web3.js";
 import { useMemo } from "react";
 // import "./App.css";
-import Content from "./Content";
+// import Content from "./Content";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Upgrade from "./Upgrade";
+import Admin from "./Admin";
+import Stake from "./Stake";
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 
@@ -36,7 +38,13 @@ function App() {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect={true}>
         <WalletModalProvider>
-          <Content />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" Component={() => <Stake />} />
+              <Route path="/upgrade" Component={() => <Upgrade />} />
+              <Route path="/admin" Component={() => <Admin />} />
+            </Routes>
+          </BrowserRouter>
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
