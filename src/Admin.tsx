@@ -5,7 +5,6 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { Connectivity, CreateStakingRoundInput } from "./connectivity";
 
 import "./Staking.css";
-import { Link } from "react-router-dom";
 
 const Admin = () => {
   const wallet = useWallet();

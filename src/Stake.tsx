@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 import _get from "lodash/get";
 import _forEach from "lodash/forEach";
@@ -8,7 +7,6 @@ import _forEach from "lodash/forEach";
 import { Connectivity } from "./connectivity";
 
 import "./Staking.css";
-import { Link } from "react-router-dom";
 import Header from "./Header";
 
 const Stake = () => {
@@ -67,7 +65,7 @@ const Stake = () => {
       ([nft, name]) => ({ nft, name })
     );
 
-    _forEach(nftNames, function (row) {
+    _forEach(nftNames, function(row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 

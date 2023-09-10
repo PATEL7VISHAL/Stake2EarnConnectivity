@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 import _get from "lodash/get";
 import _forEach from "lodash/forEach";
@@ -64,7 +63,7 @@ const Upgrade = () => {
       ([nft, name]) => ({ nft, name })
     );
 
-    _forEach(nftNames, function (row) {
+    _forEach(nftNames, function(row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 
