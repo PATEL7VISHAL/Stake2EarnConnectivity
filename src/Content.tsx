@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 import _get from "lodash/get";
@@ -11,7 +11,8 @@ import "./Staking.css";
 
 const Content = () => {
   const wallet = useWallet();
-  const connectivity = new Connectivity(wallet);
+  const { connection } = useConnection();
+  const connectivity = new Connectivity(wallet, connection);
 
   const [txStatus, setTxStatus] = useState<string>("");
 
@@ -168,9 +169,9 @@ const Content = () => {
       const NewNfts = setToObj(state.programOwnedNewNfts || new Set());
       const newNft = _get(NewNfts, selectedNFT.nftId, {})?.nft;
       const oldNft = selectedNFT.selected;
-      
+
       console.log("params", oldNft, newNft);
-      
+
       if (oldNft && newNft) {
         setTxStatus("Confirm Transaction on wallet.");
 
@@ -453,8 +454,8 @@ const Content = () => {
                 </p>
                 <button
                   disabled={
-                    (selectedNFT.selected === "" ||
-                    claimedNFTs.indexOf(selectedNFT.selected) > -1)
+                    selectedNFT.selected === "" ||
+                    claimedNFTs.indexOf(selectedNFT.selected) > -1
                   }
                   onClick={() => getReward()}
                   className="btn box-btn"

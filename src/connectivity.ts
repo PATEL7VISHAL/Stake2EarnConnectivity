@@ -126,16 +126,14 @@ export class Connectivity {
   oldCollectionId: web3.PublicKey;
   programOwnedNewNfts: Map<number, { nft: string; metadata: MetadataMJ }>;
 
-  constructor(_wallet: WalletContextState) {
+  constructor(_wallet: WalletContextState, connection: web3.Connection) {
     this.wallet = _wallet;
-    this.connection = new web3.Connection("https://api.devnet.solana.com", {
-      commitment: "confirmed",
-    });
+    this.connection = connection;
     this.metaplex = new Metaplex(this.connection);
 
     //? Program setup
     this.programId = new web3.PublicKey(
-      "DQPz7LX1PDoK51SS2KXjLrS4t3ewgpiDkSkoLNGLwZiA"
+      "HA9jURo3c5y5MxVPDAeDNfHu16LszGTEgeGZWRgzxNJZ"
     );
     // this.programId = new web3.PublicKey("BK8ySfPmvvYvDYHNwzVeqfsxhpQ6PWCEtbpovcbaNhHH")
     const anchorProvider = new AnchorProvider(this.connection, this.wallet, {
@@ -151,13 +149,13 @@ export class Connectivity {
       "58PjB3iDHSTZBfh3R2qMw8NrAxDefYCABDTxXiHm686A"
     );
     this.wBtcTokenId = new web3.PublicKey(
-      "uG6WCzPivRaLGps1pimZupyPCiFeJrvriPu74foLuPR"
+      "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh"
     );
     this.collectionId = new web3.PublicKey(
-      "J7Wb3SzgHLzojmBchTzqgy7iRjxdbWyjRLrHVyA2Wyu4"
+      "GAd7LoCMKbGCfLFCXc8fbGLsxfxp1z78bx69oJDuMws3"
     );
     this.oldCollectionId = new web3.PublicKey(
-      "5tQGk7SQLjYXhMkJFpZvyTdgptsXpDZP4qt4knWhXRRZ"
+      "F9Xr5P6bkPdGiiAxBLsY35o5Cb6Mg3xQvFAupR3K22RB"
     );
     this.programOwnedNewNfts = new Map();
   }

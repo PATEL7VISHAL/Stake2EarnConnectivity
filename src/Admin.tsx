@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 import { Connectivity, CreateStakingRoundInput } from "./connectivity";
@@ -9,7 +9,8 @@ import { Link } from "react-router-dom";
 
 const Admin = () => {
   const wallet = useWallet();
-  const connectivity = new Connectivity(wallet);
+  const { connection } = useConnection();
+  const connectivity = new Connectivity(wallet, connection);
   const [rewardAmount, setRewardAmount] = useState("");
 
   return (
@@ -18,12 +19,12 @@ const Admin = () => {
         <div className="container-fluid">
           <div className="row header-row">
             <div className="col-sm-3 text-center">
-              <Link className="text-white" to="/upgrade">
+              {/* <Link className="text-white" to="/upgrade">
                 Upgrade
               </Link>
               <Link className="ms-2 text-white" to="/">
                 Stake
-              </Link>
+              </Link> */}
               {/* <button
                 className="btn box-btn"
                 onClick={async () => await upgradeNft()}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 import _get from "lodash/get";
@@ -13,7 +13,8 @@ import Header from "./Header";
 
 const Stake = () => {
   const wallet = useWallet();
-  const connectivity = new Connectivity(wallet);
+  const { connection } = useConnection();
+  const connectivity = new Connectivity(wallet, connection);
 
   const [txStatus, setTxStatus] = useState<string>("");
 
@@ -149,32 +150,6 @@ const Stake = () => {
   return (
     <div id="wrapper">
       <Header />
-      {/* <section className="header">
-        <div className="container-fluid">
-          <div className="row header-row">
-            <div className="col-sm-3 text-center">
-            <Link className="text-white" to="/upgrade">Upgrade</Link>
-            <Link className="ms-2 text-white" to="/admin">Admin</Link> */}
-              {/* <button
-                className="btn box-btn"
-                onClick={async () => await upgradeNft()}
-              >
-                Upgrade NFT
-              </button> */}
-            {/* </div>
-            <div className="col-sm-6 text-center">
-              <img
-                className="logo-img"
-                src={require("./assets/logohrs5.png")}
-                alt="Header"
-              />
-            </div>
-            <div className="col-sm-3 text-center">
-              <WalletMultiButton />
-            </div>
-          </div>
-        </div> 
-      </section> */}
 
       <section className="content">
         <div
