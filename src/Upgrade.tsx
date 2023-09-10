@@ -63,7 +63,7 @@ const Upgrade = () => {
       ([nft, name]) => ({ nft, name })
     );
 
-    _forEach(nftNames, function(row) {
+    _forEach(nftNames, function (row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 
@@ -127,19 +127,8 @@ const Upgrade = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="mint-page-panel text-center">
-                <h2 className="text-center content-title">STAKE YOUR NDR</h2>
-                <span className="text-center content-title-sub">
-                  REWARDS MULTIPLIER
-                </span>
-                <span className="text-center content-title-sub">
-                  1-2 NFT = NO BONUS
-                </span>
-                <span className="text-center content-title-sub">
-                  3-5 NFT = 5% BONUS
-                </span>
-                <span className="text-center content-title-sub">
-                  5+ NFT = 10% BONUS
-                </span>
+                <h2 className="text-center content-title">UPGRADE YOUR HASH</h2>
+
                 <span
                   className="text-center content-title-sub my-3"
                   style={{ wordBreak: "break-all" }}
@@ -149,7 +138,7 @@ const Upgrade = () => {
             </div>
           </div>
 
-          <div className="row justify-content-around text-white text-center">
+          <div className="row justify-content-around text-white text-center mt-5">
             <div className="col-md-6 col-sm-12 mb-3">
               <span className="text-center content-title-sub">
                 AVAILABLE TO UPGRADE
@@ -206,9 +195,8 @@ const Upgrade = () => {
             </div>
 
             <div className="col-md-6 col-sm-12 mb-3">
-              <span className="text-center content-title-sub">
-                AVAILABLE TO STAKE
-              </span>
+              <span className="text-center content-title-sub">ALREADY UPGRADED</span>
+
               <div id="unStackedTokenList" className="row box1 mt-3 mb-3">
                 <div className="row">
                   {unStakedNFTs.map((nft) => (
@@ -237,16 +225,6 @@ const Upgrade = () => {
                   ))}
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="row text-center mt-5">
-            <div className="col-md-12">
-              <p className="text-center text-white">
-                <strong>
-                  NOTE: STAKING FREEZES YOUR NFT FOR 30 DAYS MINIMUM
-                </strong>
-              </p>
             </div>
           </div>
         </div>
