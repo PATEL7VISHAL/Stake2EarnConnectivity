@@ -126,11 +126,9 @@ export class Connectivity {
   oldCollectionId: web3.PublicKey;
   programOwnedNewNfts: Map<number, { nft: string; metadata: MetadataMJ }>;
 
-  constructor(_wallet: WalletContextState) {
+  constructor(_wallet: WalletContextState, connection: web3.Connection) {
     this.wallet = _wallet;
-    this.connection = new web3.Connection("https://api.devnet.solana.com", {
-      commitment: "confirmed",
-    });
+    this.connection = connection;
     this.metaplex = new Metaplex(this.connection);
 
     //? Program setup
