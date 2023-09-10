@@ -9,6 +9,7 @@ import { Connectivity } from "./connectivity";
 
 import "./Staking.css";
 import { Link } from "react-router-dom";
+import Header from "./Header";
 
 const Stake = () => {
   const wallet = useWallet();
@@ -147,19 +148,20 @@ const Stake = () => {
 
   return (
     <div id="wrapper">
-      <section className="header">
+      <Header />
+      {/* <section className="header">
         <div className="container-fluid">
           <div className="row header-row">
             <div className="col-sm-3 text-center">
             <Link className="text-white" to="/upgrade">Upgrade</Link>
-            <Link className="ms-2 text-white" to="/admin">Admin</Link>
+            <Link className="ms-2 text-white" to="/admin">Admin</Link> */}
               {/* <button
                 className="btn box-btn"
                 onClick={async () => await upgradeNft()}
               >
                 Upgrade NFT
               </button> */}
-            </div>
+            {/* </div>
             <div className="col-sm-6 text-center">
               <img
                 className="logo-img"
@@ -171,13 +173,13 @@ const Stake = () => {
               <WalletMultiButton />
             </div>
           </div>
-        </div>
-      </section>
+        </div> 
+      </section> */}
 
       <section className="content">
         <div
           className="container-fluid"
-          style={{ paddingRight: "10%", paddingLeft: "10%" }}
+          // style={{ paddingRight: "10%", paddingLeft: "10%" }}
         >
           <div className="row">
             <div className="col-md-12">
@@ -205,7 +207,7 @@ const Stake = () => {
           </div>
 
           <div className="row text-white text-center">
-            <div className="col-4 mb-3">
+            <div className="col-md-4 col-sm-12 mb-3">
               <span className="text-center content-title-sub">
                 AVAILABLE TO STAKE
               </span>
@@ -221,7 +223,7 @@ const Stake = () => {
                           nftId: -1,
                         })
                       }
-                      className="col-4 text-center"
+                      className="col-md-4 col-sm-12 text-center"
                     >
                       <div className="box1-small3 mb-2 green-check-btn">
                         {selectedNFT.selected === nft && (
@@ -265,7 +267,7 @@ const Stake = () => {
               </div>
             </div>
 
-            <div className="col-4 mb-3">
+            <div className="col-md-4 col-sm-12 col-sm-12 mb-3">
               <span className="text-center content-title-sub">STAKED NFT</span>
               <div id="stackedTokenList" className="row box1 mt-3 mb-3 pb-0">
                 <div className="row">
@@ -279,7 +281,7 @@ const Stake = () => {
                           nftId: -1,
                         })
                       }
-                      className="col-4 text-center"
+                      className="col-md-4 col-sm-12 col-sm-12 text-center"
                     >
                       <div className="box1-small3 mb-2 green-check-btn">
                         {selectedNFT.selected === nft && (
@@ -314,7 +316,7 @@ const Stake = () => {
               </div>
             </div>
 
-            <div className="col-4 mb-3">
+            <div className="col-md-4 col-sm-12 col-sm-12 mb-3">
               <span className="text-center content-title-sub">
                 $TOKEN SUMMARY
               </span>

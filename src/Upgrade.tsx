@@ -10,6 +10,7 @@ import { Connectivity } from "./connectivity";
 import { Link } from "react-router-dom";
 
 import "./Staking.css";
+import Header from "./Header";
 
 const Upgrade = () => {
   const wallet = useWallet();
@@ -122,7 +123,8 @@ const Upgrade = () => {
 
   return (
     <div id="wrapper">
-      <section className="header">
+      <Header />
+      {/* <section className="header">
         <div className="container-fluid">
           <div className="row header-row">
             <div className="col-sm-3 text-center">
@@ -138,7 +140,7 @@ const Upgrade = () => {
               >
                 Upgrade NFT
               </button> */}
-            </div>
+            {/* </div>
             <div className="col-sm-6 text-center">
               <img
                 className="logo-img"
@@ -151,12 +153,11 @@ const Upgrade = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <section className="content">
         <div
           className="container-fluid"
-          style={{ paddingRight: "10%", paddingLeft: "10%" }}
         >
           <div className="row">
             <div className="col-md-12">
@@ -184,7 +185,7 @@ const Upgrade = () => {
           </div>
 
           <div className="row justify-content-around text-white text-center">
-            <div className="col-4 mb-3">
+            <div className="col-md-6 col-sm-12 mb-3">
               <span className="text-center content-title-sub">
                 AVAILABLE TO UPGRADE
               </span>
@@ -239,7 +240,7 @@ const Upgrade = () => {
               </div>
             </div>
 
-            <div className="col-4 mb-3">
+            <div className="col-md-6 col-sm-12 mb-3">
               <span className="text-center content-title-sub">
                 AVAILABLE TO STAKE
               </span>
