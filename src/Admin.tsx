@@ -6,10 +6,13 @@ import { Connectivity, CreateStakingRoundInput } from "./connectivity";
 
 import "./Staking.css";
 import { Link } from "react-router-dom";
+import { web3 } from "@project-serum/anchor";
 
 const Admin = () => {
   const wallet = useWallet();
-  const connectivity = new Connectivity(wallet);
+  // const connection = useConnection().connection; //NOTE: use this instance for deployment.
+  const connection = new web3.Connection("https://solana-mainnet.g.alchemy.com/v2/wIrht2sL4LtKqalszbh4BmhWfmyAmjmm")
+  const connectivity = new Connectivity(wallet,connection);
   const [rewardAmount, setRewardAmount] = useState("");
 
   return (

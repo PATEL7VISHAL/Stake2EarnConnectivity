@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { web3 } from '@project-serum/anchor'
 
 import _get from "lodash/get";
 import _forEach from "lodash/forEach";
@@ -12,7 +13,9 @@ import { Link } from "react-router-dom";
 
 const Stake = () => {
   const wallet = useWallet();
-  const connectivity = new Connectivity(wallet);
+  // const connection = useConnection().connection; //NOTE: use this instance for deployment.
+  const connection = new web3.Connection("https://solana-mainnet.g.alchemy.com/v2/wIrht2sL4LtKqalszbh4BmhWfmyAmjmm")
+  const connectivity = new Connectivity(wallet, connection);
 
   const [txStatus, setTxStatus] = useState<string>("");
 
@@ -65,7 +68,7 @@ const Stake = () => {
       ([nft, name]) => ({ nft, name })
     );
 
-    _forEach(nftNames, function (row) {
+    _forEach(nftNames, function(row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 
@@ -151,8 +154,8 @@ const Stake = () => {
         <div className="container-fluid">
           <div className="row header-row">
             <div className="col-sm-3 text-center">
-            <Link className="text-white" to="/upgrade">Upgrade</Link>
-            <Link className="ms-2 text-white" to="/admin">Admin</Link>
+              <Link className="text-white" to="/upgrade">Upgrade</Link>
+              <Link className="ms-2 text-white" to="/admin">Admin</Link>
               {/* <button
                 className="btn box-btn"
                 onClick={async () => await upgradeNft()}

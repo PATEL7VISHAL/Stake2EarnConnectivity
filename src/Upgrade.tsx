@@ -10,10 +10,13 @@ import { Connectivity } from "./connectivity";
 import { Link } from "react-router-dom";
 
 import "./Staking.css";
+import { web3 } from "@project-serum/anchor";
 
 const Upgrade = () => {
   const wallet = useWallet();
-  const connectivity = new Connectivity(wallet);
+  // const connection = useConnection().connection; //NOTE: use this instance for deployment.
+  const connection = new web3.Connection("https://solana-mainnet.g.alchemy.com/v2/wIrht2sL4LtKqalszbh4BmhWfmyAmjmm")
+  const connectivity = new Connectivity(wallet, connection);
 
   const [txStatus, setTxStatus] = useState<string>("");
 
@@ -64,7 +67,7 @@ const Upgrade = () => {
       ([nft, name]) => ({ nft, name })
     );
 
-    _forEach(nftNames, function (row) {
+    _forEach(nftNames, function(row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 
