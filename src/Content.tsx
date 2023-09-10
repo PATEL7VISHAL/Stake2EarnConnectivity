@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 import _get from "lodash/get";
 import _forEach from "lodash/forEach";
 
 import { Connectivity, CreateStakingRoundInput } from "./connectivity";
+import { web3 } from "@project-serum/anchor";
 
 import "./Staking.css";
 
 const Content = () => {
   const wallet = useWallet();
-  const connectivity = new Connectivity(wallet);
+  // const connection = useConnection().connection; //NOTE: use this instance for deployment.
+  const connection = new web3.Connection("https://solana-mainnet.g.alchemy.com/v2/wIrht2sL4LtKqalszbh4BmhWfmyAmjmm")
+  const connectivity = new Connectivity(wallet, connection);
 
   const [txStatus, setTxStatus] = useState<string>("");
 
