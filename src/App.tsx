@@ -21,7 +21,8 @@ import Stake from "./Stake";
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 function App() {
-  const solNetwork = WalletAdapterNetwork.Devnet;
+  // const solNetwork = WalletAdapterNetwork.Devnet;
+  const solNetwork = WalletAdapterNetwork.Mainnet;
   const endpoint = useMemo(() => clusterApiUrl(solNetwork), [solNetwork]);
 
   const wallets = useMemo(
@@ -35,8 +36,8 @@ function App() {
   );
 
   return (
-    // <ConnectionProvider endpoint={endpoint}>
-    <ConnectionProvider endpoint={"https://solana-mainnet.g.alchemy.com/v2/wIrht2sL4LtKqalszbh4BmhWfmyAmjmm"}>
+    <ConnectionProvider endpoint={endpoint}>
+      {/* <ConnectionProvider endpoint={"https://solana-mainnet.g.alchemy.com/v2/wIrht2sL4LtKqalszbh4BmhWfmyAmjmm"}> */}
       <WalletProvider wallets={wallets} autoConnect={true}>
         <WalletModalProvider>
           <BrowserRouter>

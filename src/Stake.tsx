@@ -65,7 +65,7 @@ const Stake = () => {
       ([nft, name]) => ({ nft, name })
     );
 
-    _forEach(nftNames, function (row) {
+    _forEach(nftNames, function(row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 
@@ -152,7 +152,7 @@ const Stake = () => {
       <section className="content">
         <div
           className="container-fluid"
-          // style={{ paddingRight: "10%", paddingLeft: "10%" }}
+        // style={{ paddingRight: "10%", paddingLeft: "10%" }}
         >
           <div className="row">
             <div className="col-md-12">
@@ -176,7 +176,7 @@ const Stake = () => {
           <div className="row text-white text-center">
             <div className="col-md-4 col-sm-12 mb-3">
               <span className="text-center content-title-sub">
-              AVAILABLE FOR STAKING
+                AVAILABLE FOR STAKING
               </span>
               <div id="unStackedTokenList" className="row box1 mt-3 mb-3">
                 <div className="row">

