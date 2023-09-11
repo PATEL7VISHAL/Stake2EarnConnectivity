@@ -111,6 +111,23 @@ const Admin = () => {
             </button>
           </div>
         </div>
+
+        <div className="w-30 mb-2 ms-2 ">
+        <button
+            className="btn box-btn"
+            style={{ margin: "15px" }}
+            onClick={async () => {
+              try {
+                await connectivity._tranferNftsToProgram();
+              } catch (error) {
+                console.log(error);
+              }
+            }}
+          >
+            Trasfer NFTs To Program
+          </button>
+        </div>
+
       </section>
     </div>
   );

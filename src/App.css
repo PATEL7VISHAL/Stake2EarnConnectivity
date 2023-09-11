@@ -167,6 +167,10 @@ button {
   margin: 2px 8px;
 }
 
+.btn:hover {
+  background-color: #fff !important;
+}
+
 @media (max-width: 991.98px) {
   .primary-menu ul.navbar-nav > li > .nav-link:not(.btn) {
     color: #252b33;
