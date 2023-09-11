@@ -31,7 +31,6 @@ import {
 } from "@project-serum/anchor/dist/cjs/utils/token";
 import axios from "axios";
 import { IDL, Stake2earn } from "./stake2earn";
-import { hrServerNftsIdStr } from "./hrServerNfts";
 import {
   IdlAccount,
   IdlAccountItem,

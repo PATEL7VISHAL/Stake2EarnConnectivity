@@ -35,7 +35,8 @@ function App() {
   );
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
+    // <ConnectionProvider endpoint={endpoint}>
+    <ConnectionProvider endpoint={"https://solana-mainnet.g.alchemy.com/v2/wIrht2sL4LtKqalszbh4BmhWfmyAmjmm"}>
       <WalletProvider wallets={wallets} autoConnect={true}>
         <WalletModalProvider>
           <BrowserRouter>
