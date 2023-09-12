@@ -907,7 +907,7 @@ export class Connectivity {
       true
     );
     const rewardAmount = new BN(
-      Connectivity.calculateNonDecimalValue(input.rewardAmount, 9)
+      Connectivity.calculateNonDecimalValue(input.rewardAmount, 8)
     );
 
     const ix = await this.program.methods
