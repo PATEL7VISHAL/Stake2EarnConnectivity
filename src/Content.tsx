@@ -77,11 +77,24 @@ const Content = () => {
       }
     );
 
-    const nftNames = Array.from(state.nftInfos || new Map()).map(
-      ([nft, name]) => ({ nft, name })
+    // const nftNames = Array.from(state.nftInfos || new Map()).map(
+    //   ([nft, name]) => ({ nft, name })
+    // );
+    const nftNames = Array.from(state.nftInfos || new Map<string, {
+      name: string;
+      image: string;
+    }>()).map(
+      ([nft, nftInfo]) => ({ nft, name: nftInfo?.name })
+    );
+    const nftImages = Array.from(state.nftInfos || new Map<string, {
+      name: string;
+      image: string;
+    }>()).map(
+      ([nft, nftInfo]) => ({ nft, name: nftInfo?.image })
     );
 
-    _forEach(nftNames, function (row) {
+
+    _forEach(nftNames, function(row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 

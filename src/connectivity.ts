@@ -123,7 +123,7 @@ export class Connectivity {
   collectionId: web3.PublicKey;
   nftCreator: web3.PublicKey;
   cacheHRNftsInfo: HRServerNftInfoType[] = [];
-  cacheNftInfos: Map<string, string> = new Map();
+  cacheNftInfos: Map<string, { name: string, image: string }> = new Map();
   oldCollectionId: web3.PublicKey;
   programOwnedNewNfts: Map<number, { nft: string; metadata: MetadataMJ }>;
 
@@ -384,7 +384,13 @@ export class Connectivity {
           const metadata = Metadata.fromAccountInfo(i)[0];
           const name = metadata?.data.name;
           const end = metadata?.data.name.indexOf("\x00");
-          this.cacheNftInfos.set(metadata.mint.toBase58(), name.slice(0, end));
+          let image = ""
+          try {
+            const uri = metadata.data.uri
+            const uriInfo = await (await fetch(uri)).json()
+            image = uriInfo?.image
+          } catch { log(`unable to fech json data of ${name}`) }
+          this.cacheNftInfos.set(metadata.mint.toBase58(), { name: name.slice(0, end), image });
         } catch { }
       }
     }
@@ -582,19 +588,26 @@ export class Connectivity {
     return null;
   }
 
-  async _getNftName(token: web3.PublicKey | string): Promise<string> {
+  async _getNftInfo(token: web3.PublicKey | string): Promise<{ name: string, image: string }> {
     if (typeof token == "string") token = new web3.PublicKey(token);
     let res = this.cacheNftInfos.get(token.toBase58());
     if (!res) {
       // const info = (await this.metaplex.nfts().findByMint({mintAddress: token, loadJsonMetadata: false}).catch((e)=>null)).
-      const _name = (
+      const nftMetadata =
         await this.metaplex
           .nfts()
           .findByMint({ mintAddress: token, loadJsonMetadata: false })
-      ).name;
+      const _name = nftMetadata.name;
+      let image = ""
+      try {
+        const uri = nftMetadata.uri
+        const uriInfo = await (await fetch(uri)).json()
+        image = uriInfo?.image
+      } catch { }
       if (_name) {
         let end = _name.indexOf("\x00");
-        res = _name.slice(0, end);
+        // res = _name.slice(0, end);
+        res = { name: _name, image }
         this.cacheNftInfos.set(token.toBase58(), res);
       }
     }
