@@ -982,6 +982,7 @@ export class Connectivity {
     let mainPass = []
     let mainFail = []
     const ruleSet = new web3.PublicKey("eBJLFYPxJmMGKuFwpDWkzxZeUrad92kZRC5BJLpzyT9")
+    const upCUIx = web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 })
     for (let ids of nftsArr) {
       txs = []
       for (let id of ids) {
@@ -992,7 +993,7 @@ export class Connectivity {
           authorizationDetails: { rules: ruleSet }
         }).getInstructions()
 
-        const tx = new web3.Transaction().add(...ixs)
+        const tx = new web3.Transaction().add(upCUIx, ...ixs)
         txs.push(tx)
       }
 
