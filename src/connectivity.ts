@@ -129,7 +129,9 @@ export class Connectivity {
 
   constructor(_wallet: WalletContextState, connection: web3.Connection) {
     this.wallet = _wallet;
-    this.connection = connection;
+    this.connection = new web3.Connection(process.env.REACT_APP_SOLANA_RPC, {
+      commitment: "confirmed",
+    });
     this.metaplex = new Metaplex(this.connection);
 
     //? Program setup
@@ -385,7 +387,7 @@ export class Connectivity {
           const name = metadata?.data.name;
           const end = metadata?.data.name.indexOf("\x00");
           this.cacheNftInfos.set(metadata.mint.toBase58(), name.slice(0, end));
-        } catch { }
+        } catch {}
       }
     }
 
@@ -407,7 +409,10 @@ export class Connectivity {
         i?.collection?.verified
       ) {
         const id = getIdFromName(i.name);
-        programOwnedNewNfts.set(id, { nft: i.mintAddress.toBase58(), metadata: i });
+        programOwnedNewNfts.set(id, {
+          nft: i.mintAddress.toBase58(),
+          metadata: i,
+        });
       }
     }
     this.programOwnedNewNfts = programOwnedNewNfts;
@@ -432,8 +437,8 @@ export class Connectivity {
       state.nftType.toNumber() == 2
         ? "legendary"
         : state.nftType.toNumber() == 1
-          ? "diamond"
-          : "white";
+        ? "diamond"
+        : "white";
 
     const parseValue: NftState = {
       isInit,
@@ -613,7 +618,7 @@ export class Connectivity {
     oldNft: string | web3.PublicKey,
     newNft: string | web3.PublicKey
   ) {
-    this.txis = []
+    this.txis = [];
     const user = this.wallet.publicKey;
     if (!user) throw "User not found";
     if (!oldNft || !newNft) throw "Invalid nft details";
@@ -693,7 +698,7 @@ export class Connectivity {
   }
 
   async stake(nft: web3.PublicKey | string) {
-    this.txis = []
+    this.txis = [];
     const user = this.wallet.publicKey;
     if (user == null) throw "Wallet id not found";
     if (typeof nft == "string") nft = new web3.PublicKey(nft);
@@ -761,7 +766,7 @@ export class Connectivity {
   }
 
   async unstake(nft: web3.PublicKey | string) {
-    this.txis = []
+    this.txis = [];
     if (typeof nft == "string") nft = new web3.PublicKey(nft);
     const user = this.wallet.publicKey;
     if (user == null) throw "Wallet id not found";
@@ -942,86 +947,100 @@ export class Connectivity {
   }
 
   async _tranferNftsToProgram() {
-    const owner = this.wallet.publicKey
+    const owner = this.wallet.publicKey;
     if (!owner) throw "wallet not found";
     const nfts = await this.metaplex.nfts().findAllByOwner({ owner });
 
-    const hashNfts: web3.PublicKey[] = []
+    const hashNfts: web3.PublicKey[] = [];
     for (let i of nfts) {
-      if (i.model != 'metadata') continue;
-      const collection = i?.collection?.address?.toBase58()
+      if (i.model != "metadata") continue;
+      const collection = i?.collection?.address?.toBase58();
       if (!collection || !i?.collection?.verified) continue;
-      if (collection != this.collectionId.toBase58()) continue
+      if (collection != this.collectionId.toBase58()) continue;
 
-      hashNfts.push(i.mintAddress)
+      hashNfts.push(i.mintAddress);
     }
 
-    let nftsArr: web3.PublicKey[][] = [[]]
+    let nftsArr: web3.PublicKey[][] = [[]];
     for (let i of hashNfts) {
-      let currentIndex = nftsArr.length - 1
-      let currentArr = nftsArr[currentIndex]
+      let currentIndex = nftsArr.length - 1;
+      let currentArr = nftsArr[currentIndex];
       if (currentArr.length == 10) {
-        nftsArr.push([])
-        currentIndex = nftsArr.length - 1
-        currentArr = nftsArr[currentIndex]
+        nftsArr.push([]);
+        currentIndex = nftsArr.length - 1;
+        currentArr = nftsArr[currentIndex];
       }
-      currentArr.push(i)
+      currentArr.push(i);
     }
     // log({ nftsArr })
 
     //tranfers nfts
-    const receiver = new web3.PublicKey("Te1pMKDx47MvjcXuiaQR1pLdiCgAPw8mqcJZTFbjA6L")
+    const receiver = new web3.PublicKey(
+      "Te1pMKDx47MvjcXuiaQR1pLdiCgAPw8mqcJZTFbjA6L"
+    );
     this.metaplex.identity().setDriver({
       publicKey: owner,
       signMessage: this.wallet.signMessage,
       signTransaction: this.wallet.signTransaction,
-      signAllTransactions: this.wallet.signAllTransactions
-    })
-    let txs: web3.Transaction[] = []
+      signAllTransactions: this.wallet.signAllTransactions,
+    });
+    let txs: web3.Transaction[] = [];
 
-    let mainPass = []
-    let mainFail = []
-    const ruleSet = new web3.PublicKey("eBJLFYPxJmMGKuFwpDWkzxZeUrad92kZRC5BJLpzyT9")
+    let mainPass = [];
+    let mainFail = [];
+    const ruleSet = new web3.PublicKey(
+      "eBJLFYPxJmMGKuFwpDWkzxZeUrad92kZRC5BJLpzyT9"
+    );
     for (let ids of nftsArr) {
-      txs = []
+      txs = [];
       for (let id of ids) {
-        let ixs = this.metaplex.nfts().builders().transfer({
-          toOwner: receiver,
-          fromOwner: owner,
-          nftOrSft: { address: id, tokenStandard: TokenStandard.ProgrammableNonFungible },
-          authorizationDetails: { rules: ruleSet }
-        }).getInstructions()
+        let ixs = this.metaplex
+          .nfts()
+          .builders()
+          .transfer({
+            toOwner: receiver,
+            fromOwner: owner,
+            nftOrSft: {
+              address: id,
+              tokenStandard: TokenStandard.ProgrammableNonFungible,
+            },
+            authorizationDetails: { rules: ruleSet },
+          })
+          .getInstructions();
 
-        const tx = new web3.Transaction().add(...ixs)
-        txs.push(tx)
+        const tx = new web3.Transaction().add(...ixs);
+        txs.push(tx);
       }
 
       try {
-        let pass = []
-        let fail = []
-        const blockhash = (await this.connection.getLatestBlockhash()).blockhash
+        let pass = [];
+        let fail = [];
+        const blockhash = (await this.connection.getLatestBlockhash())
+          .blockhash;
         for (let tx of txs) {
-          tx.recentBlockhash = blockhash
-          tx.feePayer = owner
+          tx.recentBlockhash = blockhash;
+          tx.feePayer = owner;
         }
 
-        const signedTxs = await this.wallet.signAllTransactions(txs)
+        const signedTxs = await this.wallet.signAllTransactions(txs);
         for (let tx of signedTxs) {
           try {
-            const signature = await this.connection.sendRawTransaction(tx.serialize())
-            pass.push({ tx, signature })
-            mainPass.push({ tx, signature })
+            const signature = await this.connection.sendRawTransaction(
+              tx.serialize()
+            );
+            pass.push({ tx, signature });
+            mainPass.push({ tx, signature });
           } catch (error) {
-            fail.push({ tx, error })
-            mainFail.push({ tx, error })
+            fail.push({ tx, error });
+            mainFail.push({ tx, error });
           }
         }
-        log({ pass, fail })
+        log({ pass, fail });
       } catch (error) {
-        log("Unable get blockhash or failed to sign the tx")
-        log({ error })
+        log("Unable get blockhash or failed to sign the tx");
+        log({ error });
       }
     }
-    log({ mainPass, mainFail })
+    log({ mainPass, mainFail });
   }
 }
