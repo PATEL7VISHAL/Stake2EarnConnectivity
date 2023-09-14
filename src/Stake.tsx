@@ -42,8 +42,6 @@ const Stake = () => {
 
     const state = await connectivity.__getMainStateInfo();
 
-    console.log("state", state);
-
     Object.keys(_get(state, "mainState.nftsState", {}) || []).forEach(
       async (index) => {
         const _nft = _get(state, `mainState.nftsState.${index}`, {});
@@ -61,24 +59,34 @@ const Stake = () => {
       }
     );
 
-    // const nftNames = Array.from(state.nftInfos || new Map()).map(
-    //   ([nft, name]) => ({ nft, name })
-    // );
-    const nftNames = Array.from(state.nftInfos || new Map<string, {
-      name: string;
-      image: string;
-    }>()).map(
-      ([nft, nftInfo]) => ({ nft, name: nftInfo?.name })
-    );
-    const nftImages = Array.from(state.nftInfos || new Map<string, {
-      name: string;
-      image: string;
-    }>()).map(
-      ([nft, nftInfo]) => ({ nft, name: nftInfo?.image })
-    );
+    const nftNames = Array.from(
+      state.nftInfos ||
+        new Map<
+          string,
+          {
+            name: string;
+            image: string;
+          }
+        >()
+    ).map(([nft, nftInfo]) => ({ nft, name: nftInfo?.name }));
 
-    _forEach(nftNames, function(row) {
+    const nftImages = Array.from(
+      state.nftInfos ||
+        new Map<
+          string,
+          {
+            name: string;
+            image: string;
+          }
+        >()
+    ).map(([nft, nftInfo]) => ({ nft, name: nftInfo?.image }));
+
+    _forEach(nftNames, function (row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
+    });
+
+    _forEach(nftImages, function (row) {
+      _NFTInfo[row.nft]["image"] = row.name;
     });
 
     setStats({
@@ -164,7 +172,7 @@ const Stake = () => {
       <section className="content">
         <div
           className="container-fluid"
-        // style={{ paddingRight: "10%", paddingLeft: "10%" }}
+          // style={{ paddingRight: "10%", paddingLeft: "10%" }}
         >
           <div className="row">
             <div className="col-md-12">
@@ -173,9 +181,15 @@ const Stake = () => {
                 <span className="text-center content-title-sub">
                   REWARDS DISTRIBUTION
                 </span>
-                <span className="text-center content-title-sub">White = 42.5%</span>
-                <span className="text-center content-title-sub">Diamond = 52.5%</span>
-                <span className="text-center content-title-sub">Legendary = 5%</span>
+                <span className="text-center content-title-sub">
+                  White = 42.5%
+                </span>
+                <span className="text-center content-title-sub">
+                  Diamond = 52.5%
+                </span>
+                <span className="text-center content-title-sub">
+                  Legendary = 5%
+                </span>
                 <span
                   className="text-center content-title-sub my-3"
                   style={{ wordBreak: "break-all" }}
@@ -204,7 +218,13 @@ const Stake = () => {
                       }
                       className="col-md-4 col-sm-12 text-center"
                     >
-                      <div className="box1-small3 mb-2 green-check-btn">
+                      <div
+                        className="box1-small3 mb-2 green-check-btn"
+                        style={{
+                          backgroundImage: `url(${NFTInfo[nft]?.image})`,
+                          backgroundSize: "contain",
+                        }}
+                      >
                         {selectedNFT.selected === nft && (
                           <img
                             className="green-check "
@@ -213,7 +233,7 @@ const Stake = () => {
                           />
                         )}
                       </div>
-                      <span>{NFTInfo[nft].name}</span>
+                      <span>{NFTInfo[nft]?.name}</span>
                     </div>
                   ))}
                 </div>
@@ -262,7 +282,13 @@ const Stake = () => {
                       }
                       className="col-md-4 col-sm-12 col-sm-12 text-center"
                     >
-                      <div className="box1-small3 mb-2 green-check-btn">
+                      <div
+                        className="box1-small3 mb-2 green-check-btn"
+                        style={{
+                          backgroundImage: `url(${NFTInfo[nft]?.image})`,
+                          backgroundSize: "contain",
+                        }}
+                      >
                         {selectedNFT.selected === nft && (
                           <img
                             className="green-check "
@@ -320,9 +346,7 @@ const Stake = () => {
                 </div>
               </div>
               <div>
-                <p>
-                  Click below to claim your REWARD
-                </p>
+                <p>Click below to claim your REWARD</p>
                 <button
                   disabled={
                     selectedNFT.selected === "" ||

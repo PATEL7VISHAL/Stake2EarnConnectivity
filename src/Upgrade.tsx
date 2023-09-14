@@ -44,8 +44,6 @@ const Upgrade = () => {
 
     const state = await connectivity.__getMainStateInfo();
 
-    console.log("state", state);
-
     Object.keys(_get(state, "mainState.nftsState", {}) || []).forEach(
       async (index) => {
         const _nft = _get(state, `mainState.nftsState.${index}`, {});
@@ -59,24 +57,34 @@ const Upgrade = () => {
       }
     );
 
-    // const nftNames = Array.from(state.nftInfos || new Map()).map(
-    //   ([nft, name]) => ({ nft, name })
-    // );
-    const nftNames = Array.from(state.nftInfos || new Map<string, {
-      name: string;
-      image: string;
-    }>()).map(
-      ([nft, nftInfo]) => ({ nft, name: nftInfo?.name })
-    );
-    const nftImages = Array.from(state.nftInfos || new Map<string, {
-      name: string;
-      image: string;
-    }>()).map(
-      ([nft, nftInfo]) => ({ nft, name: nftInfo?.image })
-    );
+    const nftNames = Array.from(
+      state.nftInfos ||
+        new Map<
+          string,
+          {
+            name: string;
+            image: string;
+          }
+        >()
+    ).map(([nft, nftInfo]) => ({ nft, name: nftInfo?.name }));
 
-    _forEach(nftNames, function(row) {
+    const nftImages = Array.from(
+      state.nftInfos ||
+        new Map<
+          string,
+          {
+            name: string;
+            image: string;
+          }
+        >()
+    ).map(([nft, nftInfo]) => ({ nft, name: nftInfo?.image }));
+
+    _forEach(nftNames, function (row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
+    });
+
+    _forEach(nftImages, function (row) {
+      _NFTInfo[row.nft]["image"] = row.name;
     });
 
     setNFTInfo(_NFTInfo);
@@ -100,8 +108,6 @@ const Upgrade = () => {
       const NewNfts = setToObj(state.programOwnedNewNfts || new Set());
       const newNft = _get(NewNfts, selectedNFT.nftId, {})?.nft;
       const oldNft = selectedNFT.selected;
-
-      console.log("params", oldNft, newNft);
 
       if (oldNft && newNft) {
         setTxStatus("Confirm Transaction on wallet.");
@@ -172,7 +178,13 @@ const Upgrade = () => {
                         }}
                         className="col-4 text-center"
                       >
-                        <div className="box1-small3 mb-2 green-check-btn">
+                        <div
+                          className="box1-small3 mb-2 green-check-btn"
+                          style={{
+                            backgroundImage: `url(${NFTInfo[nft]?.image})`,
+                            backgroundSize: "contain",
+                          }}
+                        >
                           {selectedNFT.selected === nft && (
                             <img
                               className="green-check "
@@ -207,7 +219,9 @@ const Upgrade = () => {
             </div>
 
             <div className="col-md-6 col-sm-12 mb-3">
-              <span className="text-center content-title-sub">ALREADY UPGRADED</span>
+              <span className="text-center content-title-sub">
+                ALREADY UPGRADED
+              </span>
 
               <div id="unStackedTokenList" className="row box1 mt-3 mb-3">
                 <div className="row">
@@ -223,7 +237,10 @@ const Upgrade = () => {
                       }
                       className="col-4 text-center"
                     >
-                      <div className="box1-small3 mb-2 green-check-btn">
+                      <div className="box1-small3 mb-2 green-check-btn" style={{
+                            backgroundImage: `url(${NFTInfo[nft]?.image})`,
+                            backgroundSize: "contain",
+                          }}>
                         {selectedNFT.selected === nft && (
                           <img
                             className="green-check "
