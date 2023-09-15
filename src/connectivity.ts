@@ -299,8 +299,8 @@ export class Connectivity {
     //NOTE: getting user info:
     let userNfts = await this.metaplex
       .nfts()
-      // .findAllByOwner({ owner: this.wallet.publicKey })
-      .findAllByOwner({ owner: new web3.PublicKey("DUgMPhaLhWNvqqCz2onYWVY8cWHjASFv33zXfz5UdmLs") })
+      .findAllByOwner({ owner: this.wallet.publicKey })
+      // .findAllByOwner({ owner: new web3.PublicKey("DUgMPhaLhWNvqqCz2onYWVY8cWHjASFv33zXfz5UdmLs") })
       .catch<FindNftsByOwnerOutput>((_) => []);
 
     const _programOwnedNfts = this.metaplex
@@ -389,8 +389,8 @@ export class Connectivity {
         const accountsInfos = await this.connection.getMultipleAccountsInfo(i)
         _NftMetadataInfo.push(...accountsInfos)
       }
-      log({ chunkedMetadataAccountsKeys })
-      log({ _NftMetadataInfo })
+      // log({ chunkedMetadataAccountsKeys })
+      // log({ _NftMetadataInfo })
       // let _NftMetadataInfo:web3.AccountInfo<Buffer>[] = await this.connection.getMultipleAccountsInfo(
       //   _NftsMetadataAccountKeys
       // );
