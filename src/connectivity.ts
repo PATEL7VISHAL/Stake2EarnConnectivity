@@ -376,9 +376,22 @@ export class Connectivity {
       let _NftsMetadataAccountKeys: web3.PublicKey[] = Array.from(
         allNftsStr
       ).map((e) => this.__getMetadataAccount(new web3.PublicKey(e)));
-      let _NftMetadataInfo = await this.connection.getMultipleAccountsInfo(
-        _NftsMetadataAccountKeys
-      );
+
+      const chunkedMetadataAccountsKeys: web3.PublicKey[][] = []
+      for (let i = 0; i < _NftsMetadataAccountKeys.length; i += 50) {
+        const chunk = _NftsMetadataAccountKeys.slice(i, i + 50);
+        chunkedMetadataAccountsKeys.push(chunk);
+      }
+
+      let _NftMetadataInfo: web3.AccountInfo<Buffer>[] = []
+      for (let i of chunkedMetadataAccountsKeys) {
+        const accountsInfos = await this.connection.getMultipleAccountsInfo(i)
+        _NftMetadataInfo.push(...accountsInfos)
+      }
+      // let _NftMetadataInfo:web3.AccountInfo<Buffer>[] = await this.connection.getMultipleAccountsInfo(
+      //   _NftsMetadataAccountKeys
+      // );
+
       for (let i of _NftMetadataInfo) {
         if (!i) continue;
 
@@ -443,8 +456,8 @@ export class Connectivity {
       state.nftType.toNumber() == 2
         ? "legendary"
         : state.nftType.toNumber() == 1
-        ? "diamond"
-        : "white";
+          ? "diamond"
+          : "white";
 
     const parseValue: NftState = {
       isInit,
