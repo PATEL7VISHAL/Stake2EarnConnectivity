@@ -293,7 +293,8 @@ const Content = () => {
                       >
                         <div className="box1-small3 mb-2 green-check-btn" style={{
                           backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                          backgroundSize: "contain",
+                          backgroundSize: "cover",
+                          backgroundRepeat: "no-repeat",
                         }}>
                           {selectedNFT.selected === nft && (
                             <img
@@ -348,7 +349,8 @@ const Content = () => {
                     >
                       <div className="box1-small3 mb-2 green-check-btn" style={{
                           backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                          backgroundSize: "contain",
+                          backgroundSize: "cover",
+                          backgroundRepeat: "no-repeat",
                         }}>
                         {selectedNFT.selected === nft && (
                           <img
@@ -409,7 +411,8 @@ const Content = () => {
                     >
                       <div className="box1-small3 mb-2 green-check-btn" style={{
                           backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                          backgroundSize: "contain",
+                          backgroundSize: "cover",
+                          backgroundRepeat: "no-repeat",
                         }}>
                         {selectedNFT.selected === nft && (
                           <img

@@ -182,7 +182,8 @@ const Upgrade = () => {
                           className="box1-small3 mb-2 green-check-btn"
                           style={{
                             backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                            backgroundSize: "contain",
+                            backgroundSize: "cover",
+                            backgroundRepeat: "no-repeat",
                           }}
                         >
                           {selectedNFT.selected === nft && (
@@ -239,7 +240,8 @@ const Upgrade = () => {
                     >
                       <div className="box1-small3 mb-2 green-check-btn" style={{
                             backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                            backgroundSize: "contain",
+                            backgroundSize: "cover",
+                            backgroundRepeat: "no-repeat",
                           }}>
                         {selectedNFT.selected === nft && (
                           <img
@@ -249,7 +251,7 @@ const Upgrade = () => {
                           />
                         )}
                       </div>
-                      <span>{NFTInfo[nft].name}</span>
+                      <span>{NFTInfo[nft]?.name}</span>
                     </div>
                   ))}
                 </div>

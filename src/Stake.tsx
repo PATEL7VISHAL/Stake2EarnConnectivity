@@ -222,7 +222,7 @@ const Stake = () => {
                         className="box1-small3 mb-2 green-check-btn"
                         style={{
                           backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                          backgroundSize: "contain",
+                          backgroundSize: "cover",
                         }}
                       >
                         {selectedNFT.selected === nft && (
@@ -286,7 +286,7 @@ const Stake = () => {
                         className="box1-small3 mb-2 green-check-btn"
                         style={{
                           backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                          backgroundSize: "contain",
+                          backgroundSize: "cover",
                         }}
                       >
                         {selectedNFT.selected === nft && (
