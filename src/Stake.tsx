@@ -16,6 +16,8 @@ const Stake = () => {
 
   const [txStatus, setTxStatus] = useState<string>("");
 
+  const [loadingState, setLoadingState] = useState(false);
+
   const [stakedNFTs, setStakedNFTs] = useState([]);
   const [unStakedNFTs, setUnStakedNFTs] = useState([]);
   const [claimedNFTs, setClaimedNFTs] = useState([]);
@@ -39,6 +41,8 @@ const Stake = () => {
     const dummyNftMaps = [];
     const _NFTInfo = {};
     const _claimedNFTs = [];
+
+    setLoadingState(true);
 
     const state = await connectivity.__getMainStateInfo();
 
@@ -101,6 +105,8 @@ const Stake = () => {
       Array.from(state.userDummyNfts).map((dn) => dummyNftMaps[dn])
     );
     setUnStakedNFTs(Array.from(state.userHRServerNfts));
+
+    setLoadingState(false);
   };
 
   const stake = async () => {
@@ -205,38 +211,42 @@ const Stake = () => {
                 AVAILABLE FOR STAKING
               </span>
               <div id="unStackedTokenList" className="row box1 mt-3 mb-3">
-                <div className="row">
-                  {unStakedNFTs.map((nft) => (
-                    <div
-                      key={nft}
-                      onClick={() =>
-                        setSelectedNFT({
-                          selected: nft,
-                          active: "unstaked",
-                          nftId: -1,
-                        })
-                      }
-                      className="col-md-4 col-sm-12 text-center"
-                    >
+                {loadingState ? (
+                  <span>Loading...</span>
+                ) : (
+                  <div className="row">
+                    {unStakedNFTs.map((nft) => (
                       <div
-                        className="box1-small3 mb-2 green-check-btn"
-                        style={{
-                          backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                          backgroundSize: "cover",
-                        }}
+                        key={nft}
+                        onClick={() =>
+                          setSelectedNFT({
+                            selected: nft,
+                            active: "unstaked",
+                            nftId: -1,
+                          })
+                        }
+                        className="col-md-4 col-sm-12 text-center"
                       >
-                        {selectedNFT.selected === nft && (
-                          <img
-                            className="green-check "
-                            src={require("./assets/check1.png")}
-                            alt="Header"
-                          />
-                        )}
+                        <div
+                          className="box1-small3 mb-2 green-check-btn"
+                          style={{
+                            backgroundImage: `url(${NFTInfo[nft]?.image})`,
+                            backgroundSize: "cover",
+                          }}
+                        >
+                          {selectedNFT.selected === nft && (
+                            <img
+                              className="green-check "
+                              src={require("./assets/check1.png")}
+                              alt="Header"
+                            />
+                          )}
+                        </div>
+                        <span>{NFTInfo[nft]?.name}</span>
                       </div>
-                      <span>{NFTInfo[nft]?.name}</span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div>
                 <p>
@@ -269,38 +279,42 @@ const Stake = () => {
             <div className="col-md-4 col-sm-12 col-sm-12 mb-3">
               <span className="text-center content-title-sub">STAKED NFT</span>
               <div id="stackedTokenList" className="row box1 mt-3 mb-3 pb-0">
-                <div className="row">
-                  {stakedNFTs.map((nft) => (
-                    <div
-                      key={nft}
-                      onClick={() =>
-                        setSelectedNFT({
-                          selected: nft,
-                          active: "staked",
-                          nftId: -1,
-                        })
-                      }
-                      className="col-md-4 col-sm-12 col-sm-12 text-center"
-                    >
+                {loadingState ? (
+                  <span>Loading...</span>
+                ) : (
+                  <div className="row">
+                    {stakedNFTs.map((nft) => (
                       <div
-                        className="box1-small3 mb-2 green-check-btn"
-                        style={{
-                          backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                          backgroundSize: "cover",
-                        }}
+                        key={nft}
+                        onClick={() =>
+                          setSelectedNFT({
+                            selected: nft,
+                            active: "staked",
+                            nftId: -1,
+                          })
+                        }
+                        className="col-md-4 col-sm-12 col-sm-12 text-center"
                       >
-                        {selectedNFT.selected === nft && (
-                          <img
-                            className="green-check "
-                            src={require("./assets/check1.png")}
-                            alt="Header"
-                          />
-                        )}
+                        <div
+                          className="box1-small3 mb-2 green-check-btn"
+                          style={{
+                            backgroundImage: `url(${NFTInfo[nft]?.image})`,
+                            backgroundSize: "cover",
+                          }}
+                        >
+                          {selectedNFT.selected === nft && (
+                            <img
+                              className="green-check "
+                              src={require("./assets/check1.png")}
+                              alt="Header"
+                            />
+                          )}
+                        </div>
+                        <span>{NFTInfo[nft].name}</span>
                       </div>
-                      <span>{NFTInfo[nft].name}</span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div>
                 <p>

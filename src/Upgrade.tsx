@@ -20,6 +20,8 @@ const Upgrade = () => {
   const [unStakedNFTs, setUnStakedNFTs] = useState([]);
   const [NFTInfo, setNFTInfo] = useState({});
 
+  const [loadingState, setLoadingState] = useState(false);
+
   const [selectedNFT, setSelectedNFT] = useState({
     selected: "",
     active: "",
@@ -41,7 +43,7 @@ const Upgrade = () => {
   const fetchNfts = async () => {
     const dummyNftMaps = [];
     const _NFTInfo = {};
-
+    setLoadingState(true);
     const state = await connectivity.__getMainStateInfo();
 
     Object.keys(_get(state, "mainState.nftsState", {}) || []).forEach(
@@ -98,6 +100,8 @@ const Upgrade = () => {
     });
 
     setOldNFTs(USNfts);
+
+    setLoadingState(false);
   };
 
   //Basically this function should take two nft address(oldNft and newNft)
@@ -162,6 +166,7 @@ const Upgrade = () => {
                 AVAILABLE TO UPGRADE
               </span>
               <div id="OldTokenList" className="row box1 mt-3 mb-3">
+                {loadingState ? <span>Loading...</span> : (
                 <div className="row">
                   {Object.keys(oldNFTs).map((nftId) => {
                     const nft = oldNFTs[nftId];
@@ -199,6 +204,7 @@ const Upgrade = () => {
                     );
                   })}
                 </div>
+                )}
               </div>
               <div>
                 <p>
