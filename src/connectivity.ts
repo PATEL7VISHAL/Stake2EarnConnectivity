@@ -755,6 +755,11 @@ export class Connectivity {
       programStateAccountAta
     );
 
+    const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
+      units: 300_000,
+    });
+    this.txis.push(cUIncreaseIx);
+
     const ix = await this.program.methods
       .stakeNft()
       .accounts({
@@ -868,6 +873,7 @@ export class Connectivity {
   }
 
   async getReward(nft: web3.PublicKey | string) {
+    this.txis = []
     if (typeof nft == "string") nft = new web3.PublicKey(nft);
     const user = this.wallet.publicKey;
     if (user == null) throw "Wallet id not found";
@@ -908,6 +914,7 @@ export class Connectivity {
 
   // // NOTE: Only for Admins
   async createStakingRound(input: CreateStakingRoundInput) {
+    this.txis = []
     const owner = this.wallet.publicKey;
     if (!owner) throw "wallet not found";
     const ix = await this.program.methods
@@ -929,6 +936,7 @@ export class Connectivity {
   }
 
   async endStakingRound(input: EndStakingRoundInput) {
+    this.txis = []
     const owner = this.wallet.publicKey;
     if (!owner) throw "wallet not found";
     const ownerAta = await this._getOrCreateTokenAccount(
@@ -944,6 +952,10 @@ export class Connectivity {
       Connectivity.calculateNonDecimalValue(input.rewardAmount, 8)
     );
 
+    const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
+      units: 400_000,
+    });
+    this.txis.push(cUIncreaseIx);
     const ix = await this.program.methods
       .endStakingEnd({ rewardAmount })
       .accounts({
