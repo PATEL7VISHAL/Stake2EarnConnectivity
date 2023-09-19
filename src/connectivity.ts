@@ -732,6 +732,11 @@ export class Connectivity {
     if (user == null) throw "Wallet id not found";
     if (typeof nft == "string") nft = new web3.PublicKey(nft);
 
+    const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
+      units: 300_000,
+    });
+    this.txis.push(cUIncreaseIx);
+
     const userAta = await this._getOrCreateTokenAccount(nft, user);
     const nftMetadataAccount = this.__getMetadataAccount(nft);
     const nftEditionAccount = this.__getMasterEditionAccount(nft);
@@ -754,11 +759,6 @@ export class Connectivity {
       nft,
       programStateAccountAta
     );
-
-    const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
-      units: 300_000,
-    });
-    this.txis.push(cUIncreaseIx);
 
     const ix = await this.program.methods
       .stakeNft()
