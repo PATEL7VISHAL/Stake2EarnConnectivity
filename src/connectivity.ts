@@ -655,7 +655,7 @@ export class Connectivity {
     if (typeof newNft == "string") newNft = new web3.PublicKey(newNft);
 
     const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
-      units: 500_000,
+      units: 600_000,
     });
     this.txis.push(cUIncreaseIx);
 
@@ -733,7 +733,7 @@ export class Connectivity {
     if (typeof nft == "string") nft = new web3.PublicKey(nft);
 
     const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
-      units: 300_000,
+      units: 600_000,
     });
     this.txis.push(cUIncreaseIx);
 
@@ -807,7 +807,7 @@ export class Connectivity {
 
     // Increasing Computation Budget from 200K to 300K
     const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
-      units: 300_000,
+      units: 600_000,
     });
     this.txis.push(cUIncreaseIx);
 
@@ -953,7 +953,7 @@ export class Connectivity {
     );
 
     const cUIncreaseIx = web3.ComputeBudgetProgram.setComputeUnitLimit({
-      units: 400_000,
+      units: 600_000,
     });
     this.txis.push(cUIncreaseIx);
     const ix = await this.program.methods
@@ -1030,7 +1030,7 @@ export class Connectivity {
     let mainPass = []
     let mainFail = []
     const ruleSet = new web3.PublicKey("eBJLFYPxJmMGKuFwpDWkzxZeUrad92kZRC5BJLpzyT9")
-    const upCUIx = web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 })
+    const upCUIx = web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 600000 })
     for (let ids of nftsArr) {
       txs = [];
       for (let id of ids) {
