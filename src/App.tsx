@@ -7,7 +7,6 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
-  SolletWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
 import { useMemo } from "react";
@@ -29,7 +28,6 @@ function App() {
     () => [
       new SolflareWalletAdapter(),
       new PhantomWalletAdapter(),
-      new SolletWalletAdapter(),
     ],
     // eslint-disable-next-line
     [solNetwork]
