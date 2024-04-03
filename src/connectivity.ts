@@ -131,6 +131,7 @@ export class Connectivity {
     this.wallet = _wallet;
     this.connection = new web3.Connection(process.env.REACT_APP_SOLANA_RPC, {
       commitment: "confirmed",
+      confirmTransactionInitialTimeout: 160_000
     });
     this.metaplex = new Metaplex(this.connection);
 
@@ -174,25 +175,26 @@ export class Connectivity {
   async _sendTransaction(signatures: web3.Keypair[] = []) {
     try {
       if (this.extraSignature) signatures.push(...this.extraSignature);
-      const tx = new web3.Transaction().add(...this.txis);
+      const TX_FEE = 400_000
+      const incTxFeeIx = web3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: TX_FEE })
+      const tx = new web3.Transaction().add(incTxFeeIx, ...this.txis);
       // const res = await this.wallet.sendTransaction(tx, this.connection, { signers: signatures, preflightCommitment: 'confirmed' });
-
       tx.feePayer = this.wallet.publicKey;
       const blockhash = (await this.connection.getLatestBlockhash()).blockhash;
       tx.recentBlockhash = blockhash;
       for (let i of signatures) tx.sign(i);
 
       const signedTx = await this.wallet.signTransaction(tx);
-      const res = await this.connection.sendRawTransaction(
-        signedTx.serialize()
-      );
-      log("Trasaction Sign: ", res);
+      const rawTx = Buffer.from(signedTx.serialize())
+      const txSignature = await web3.sendAndConfirmRawTransaction(this.connection, rawTx)
+      log("Trasaction Sign: ", txSignature);
       // alert("Trasaction Sussessful")
-      return res;
-    } catch (e) {
-      log("Error: ", e);
-      throw e;
-      // alert("Trasaction Fail")
+      return txSignature;
+    } catch (sendTxError) {
+      log({ sendTxError })
+      this.txis = [];
+      this.extraSignature = [];
+      throw "failed to send transaction";
     } finally {
       this.txis = [];
       this.extraSignature = [];
