@@ -60,7 +60,7 @@ const Content = () => {
 
     Object.keys(_get(state, "mainState.nftsState", {}) || []).forEach(
       async (index) => {
-        const _nft = _get(state, `mainState.nftsState.${index}`, {});
+        const _nft = _get(state, `mainState.nftsState.${index}`, {} as any);
 
         _NFTInfo[_nft.nft] = {
           ..._NFTInfo[_nft.nft],
@@ -91,7 +91,7 @@ const Content = () => {
       ([nft, nftInfo]) => ({ nft, name: nftInfo?.image })
     );
 
-    _forEach(nftNames, function(row) {
+    _forEach(nftNames, function (row) {
       _NFTInfo[row.nft] = { ..._NFTInfo[row.nft], name: row.name };
     });
 
@@ -114,7 +114,7 @@ const Content = () => {
 
     const USNfts = {};
     const OldNfts = setToObj(state.userOldNfts || new Set());
-    _forEach(OldNfts, (ON, KY) => {
+    _forEach(OldNfts, (ON:any, KY) => {
       USNfts[KY] = ON.nft;
     });
 
@@ -181,7 +181,7 @@ const Content = () => {
       const state = await connectivity.__getMainStateInfo();
 
       const NewNfts = setToObj(state.programOwnedNewNfts || new Set());
-      const newNft = _get(NewNfts, selectedNFT.nftId, {})?.nft;
+      const newNft = _get(NewNfts, selectedNFT.nftId, {} as any)?.nft;
       const oldNft = selectedNFT.selected;
 
       if (oldNft && newNft) {
@@ -348,10 +348,10 @@ const Content = () => {
                       className="col-4 text-center"
                     >
                       <div className="box1-small3 mb-2 green-check-btn" style={{
-                          backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                          backgroundSize: "cover",
-                          backgroundRepeat: "no-repeat",
-                        }}>
+                        backgroundImage: `url(${NFTInfo[nft]?.image})`,
+                        backgroundSize: "cover",
+                        backgroundRepeat: "no-repeat",
+                      }}>
                         {selectedNFT.selected === nft && (
                           <img
                             className="green-check "
@@ -410,10 +410,10 @@ const Content = () => {
                       className="col-4 text-center"
                     >
                       <div className="box1-small3 mb-2 green-check-btn" style={{
-                          backgroundImage: `url(${NFTInfo[nft]?.image})`,
-                          backgroundSize: "cover",
-                          backgroundRepeat: "no-repeat",
-                        }}>
+                        backgroundImage: `url(${NFTInfo[nft]?.image})`,
+                        backgroundSize: "cover",
+                        backgroundRepeat: "no-repeat",
+                      }}>
                         {selectedNFT.selected === nft && (
                           <img
                             className="green-check "

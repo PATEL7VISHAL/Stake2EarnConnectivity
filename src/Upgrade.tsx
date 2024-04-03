@@ -48,7 +48,7 @@ const Upgrade = () => {
 
     Object.keys(_get(state, "mainState.nftsState", {}) || []).forEach(
       async (index) => {
-        const _nft = _get(state, `mainState.nftsState.${index}`, {});
+        const _nft = _get(state, `mainState.nftsState.${index}`, {} as any);
 
         _NFTInfo[_nft.nft] = {
           ..._NFTInfo[_nft.nft],
@@ -95,7 +95,7 @@ const Upgrade = () => {
 
     const USNfts = {};
     const OldNfts = setToObj(state.userOldNfts || new Set());
-    _forEach(OldNfts, (ON, KY) => {
+    _forEach(OldNfts, (ON:any, KY) => {
       USNfts[KY] = ON.nft;
     });
 
@@ -110,7 +110,7 @@ const Upgrade = () => {
       const state = await connectivity.__getMainStateInfo();
 
       const NewNfts = setToObj(state.programOwnedNewNfts || new Set());
-      const newNft = _get(NewNfts, selectedNFT.nftId, {})?.nft;
+      const newNft = _get(NewNfts, selectedNFT.nftId, {} as any)?.nft;
       const oldNft = selectedNFT.selected;
 
       if (oldNft && newNft) {

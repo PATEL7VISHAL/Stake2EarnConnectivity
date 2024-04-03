@@ -48,7 +48,7 @@ const Stake = () => {
 
     Object.keys(_get(state, "mainState.nftsState", {}) || []).forEach(
       async (index) => {
-        const _nft = _get(state, `mainState.nftsState.${index}`, {});
+        const _nft = _get(state, `mainState.nftsState.${index}`, {} as any);
 
         _NFTInfo[_nft.nft] = {
           ..._NFTInfo[_nft.nft],
@@ -65,24 +65,24 @@ const Stake = () => {
 
     const nftNames = Array.from(
       state.nftInfos ||
-        new Map<
-          string,
-          {
-            name: string;
-            image: string;
-          }
-        >()
+      new Map<
+        string,
+        {
+          name: string;
+          image: string;
+        }
+      >()
     ).map(([nft, nftInfo]) => ({ nft, name: nftInfo?.name }));
 
     const nftImages = Array.from(
       state.nftInfos ||
-        new Map<
-          string,
-          {
-            name: string;
-            image: string;
-          }
-        >()
+      new Map<
+        string,
+        {
+          name: string;
+          image: string;
+        }
+      >()
     ).map(([nft, nftInfo]) => ({ nft, name: nftInfo?.image }));
 
     _forEach(nftNames, function (row) {
@@ -178,7 +178,7 @@ const Stake = () => {
       <section className="content">
         <div
           className="container-fluid"
-          // style={{ paddingRight: "10%", paddingLeft: "10%" }}
+        // style={{ paddingRight: "10%", paddingLeft: "10%" }}
         >
           <div className="row">
             <div className="col-md-12">
